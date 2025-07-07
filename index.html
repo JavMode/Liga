@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Liga de eFootball JOJOTOS Edición n°1</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            background: #f4f4f4;
+        }
+
+        .section {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 5px #ccc;
+        }
+
+        input,
+        select,
+        button {
+            margin: 5px;
+            padding: 5px;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 6px;
+        }
+
+        ul li button {
+            margin-left: 10px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid #999;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #eee;
+        }
+
+        .playoff-match {
+            margin-bottom: 15px;
+        }
+
+        .playoff-match label {
+            display: inline-block;
+            width: 120px;
+        }
+
+        .final-section {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 2px solid #333;
+        }
+
+        /* Estilo para mensaje flotante */
+        #messageBox {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #4caf50;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 1000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Liga de eFootball JOJOTOS Edición n°1</h1>
+
+
+    <!-- Equipos -->
+    <div class="section">
+        <h2>Jugadores</h2>
+        <input type="text" id="teamName" placeholder="Nombre del jugador" />
+        <button onclick="addTeam()">Agregar Tarado</button>
+        <ul id="teamsList"></ul>
+    </div>
+
+    <!-- Tabla de posiciones -->
+    <div class="section">
+        <h2>Tabla de Posiciones</h2>
+        <table id="standingsTable">
+            <thead>
+                <tr>
+                    <th>Pos</th>
+                    <th>Equipo</th>
+                    <th>PJ</th>
+                    <th>G</th>
+                    <th>E</th>
+                    <th>P</th>
+                    <th>GF</th>
+                    <th>GC</th>
+                    <th>DG</th>
+                    <th>Puntos</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Partidos -->
+    <div class="section">
+        <h2>Partidos</h2>
+        <select id="matchTeamA"></select>
+        <select id="matchTeamB"></select>
+        <input type="number" id="scoreA" placeholder="Goles A" min="0" />
+        <input type="number" id="scoreB" placeholder="Goles B" min="0" />
+        <button onclick="addMatch()">Agregar Resultado</button>
+        <ul id="matchesList"></ul>
+    </div>
+
+    <!-- Playoffs -->
+    <div class="section">
+        <h2>Playoffs</h2>
+        <div id="playoffMatches"></div>
+        <div id="finalSection" class="final-section" style="display:none;">
+            <h3>Final</h3>
+            <div class="playoff-match" id="finalMatch"></div>
+            <button onclick="saveFinal()" style="margin-top:10px;">Guardar Resultado Final</button>
+        </div>
+    </div>
+
+    <button onclick="generatePlayoffs()" style="padding:8px 12px; margin-bottom: 20px;">
+        Generar Playoffs
+    </button>
+    <button onclick="clearAllData()"
+        style="padding:8px 12px; margin-left: 10px; background:#e74c3c; color:white; border:none; border-radius:4px;">
+        Borrar Todos los Datos
+    </button>
+
+    <!-- Contenedor mensaje -->
+    <div id="messageBox"></div>
+
+    <script>
+        // Datos en localStorage o vacío
+        let leagueData = JSON.parse(localStorage.getItem('leagueData')) || {
+            teams: [],
+            matches: [],
+            playoffs: [],   // playoff semifinales
+            final: null     // partido final {teamA, teamB, scoreA, scoreB}
+        };
+
+        function saveData() {
+            localStorage.setItem('leagueData', JSON.stringify(leagueData));
+        }
+
+        // Equipos
+        function renderTeams() {
+            const list = document.getElementById('teamsList');
+            list.innerHTML = '';
+            leagueData.teams.forEach((team, index) => {
+                const li = document.createElement('li');
+                li.textContent = team;
+                const btn = document.createElement('button');
+                btn.textContent = 'Eliminar';
+                btn.onclick = () => {
+                    leagueData.teams.splice(index, 1);
+                    saveData();
+                    renderTeams();
+                    updateTeamSelectors();
+                    renderMatches();
+                    renderStandings();
+                    clearPlayoffsAndFinal();
+                };
+                li.appendChild(btn);
+                list.appendChild(li);
+            });
+        }
+
+        function addTeam() {
+            const name = document.getElementById('teamName').value.trim();
+            if (!name) return alert('Ingresa un nombre de equipo');
+            if (leagueData.teams.includes(name)) return alert('Equipo ya existe');
+            leagueData.teams.push(name);
+            saveData();
+            renderTeams();
+            updateTeamSelectors();
+            renderStandings();
+            clearPlayoffsAndFinal();
+            document.getElementById('teamName').value = '';
+        }
+
+        // Selects equipos para partidos normales
+        function updateTeamSelectors() {
+            const selectors = ['matchTeamA', 'matchTeamB'];
+            selectors.forEach(id => {
+                const select = document.getElementById(id);
+                select.innerHTML = '';
+                leagueData.teams.forEach(team => {
+                    const option = document.createElement('option');
+                    option.value = team;
+                    option.textContent = team;
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        // Partidos normales
+        function renderMatches() {
+            const list = document.getElementById('matchesList');
+            list.innerHTML = '';
+            leagueData.matches.forEach(m => {
+                const li = document.createElement('li');
+                li.textContent = `${m.teamA} ${m.scoreA} - ${m.scoreB} ${m.teamB}`;
+                list.appendChild(li);
+            });
+        }
+
+        function addMatch() {
+            const teamA = document.getElementById('matchTeamA').value;
+            const teamB = document.getElementById('matchTeamB').value;
+            const scoreA = parseInt(document.getElementById('scoreA').value);
+            const scoreB = parseInt(document.getElementById('scoreB').value);
+
+            if (teamA === teamB) return alert('Elige equipos diferentes para el partido');
+            if (isNaN(scoreA) || isNaN(scoreB)) return alert('Ingresa goles válidos');
+
+            leagueData.matches.push({ teamA, teamB, scoreA, scoreB });
+            saveData();
+            renderMatches();
+            renderStandings();
+
+            document.getElementById('scoreA').value = '';
+            document.getElementById('scoreB').value = '';
+        }
+
+        // Tabla de posiciones
+        function renderStandings() {
+            const tbody = document.querySelector('#standingsTable tbody');
+            tbody.innerHTML = '';
+
+            const stats = {};
+            leagueData.teams.forEach(team => {
+                stats[team] = { PJ: 0, G: 0, E: 0, P: 0, GF: 0, GC: 0, DG: 0, PTS: 0 };
+            });
+
+            leagueData.matches.forEach(m => {
+                if (!stats[m.teamA] || !stats[m.teamB]) return;
+
+                stats[m.teamA].PJ++;
+                stats[m.teamB].PJ++;
+
+                stats[m.teamA].GF += m.scoreA;
+                stats[m.teamA].GC += m.scoreB;
+                stats[m.teamB].GF += m.scoreB;
+                stats[m.teamB].GC += m.scoreA;
+
+                if (m.scoreA > m.scoreB) {
+                    stats[m.teamA].G++;
+                    stats[m.teamB].P++;
+                    stats[m.teamA].PTS += 3;
+                } else if (m.scoreA < m.scoreB) {
+                    stats[m.teamB].G++;
+                    stats[m.teamA].P++;
+                    stats[m.teamB].PTS += 3;
+                } else {
+                    stats[m.teamA].E++;
+                    stats[m.teamB].E++;
+                    stats[m.teamA].PTS += 1;
+                    stats[m.teamB].PTS += 1;
+                }
+            });
+
+            leagueData.teams.forEach(team => {
+                stats[team].DG = stats[team].GF - stats[team].GC;
+            });
+
+            const standingsArr = leagueData.teams.map(team => ({
+                team,
+                ...stats[team]
+            }));
+
+            standingsArr.sort((a, b) => {
+                if (b.PTS !== a.PTS) return b.PTS - a.PTS;
+                if (b.DG !== a.DG) return b.DG - a.DG;
+                return b.GF - a.GF;
+            });
+
+            standingsArr.forEach((teamData, i) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+          <td>${i + 1}</td>
+          <td>${teamData.team}</td>
+          <td>${teamData.PJ}</td>
+          <td>${teamData.G}</td>
+          <td>${teamData.E}</td>
+          <td>${teamData.P}</td>
+          <td>${teamData.GF}</td>
+          <td>${teamData.GC}</td>
+          <td>${teamData.DG}</td>
+          <td>${teamData.PTS}</td>
+        `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Playoffs
+        const playoffContainer = document.getElementById('playoffMatches');
+        const finalSection = document.getElementById('finalSection');
+        const finalMatchDiv = document.getElementById('finalMatch');
+
+        function renderPlayoffs() {
+            playoffContainer.innerHTML = '';
+
+            if (leagueData.playoffs.length === 0) {
+                playoffContainer.textContent = 'No hay partidos de playoffs generados.';
+                finalSection.style.display = 'none';
+                return;
+            }
+
+            leagueData.playoffs.forEach((match, i) => {
+                const div = document.createElement('div');
+                div.className = 'playoff-match';
+                div.innerHTML = `
+          <label>${match.teamA}:</label>
+          <input type="number" min="0" value="${match.scoreA}" id="playoffScoreA${i}" style="width:50px" />
+          <label>vs</label>
+          <label>${match.teamB}:</label>
+          <input type="number" min="0" value="${match.scoreB}" id="playoffScoreB${i}" style="width:50px" />
+          <button onclick="savePlayoffMatch(${i})">Guardar</button>
+        `;
+                playoffContainer.appendChild(div);
+            });
+
+            finalSection.style.display = leagueData.final ? 'block' : 'none';
+            if (leagueData.final) renderFinal();
+        }
+
+        function savePlayoffMatch(i) {
+            const scoreAInput = document.getElementById(`playoffScoreA${i}`);
+            const scoreBInput = document.getElementById(`playoffScoreB${i}`);
+            const scoreA = parseInt(scoreAInput.value);
+            const scoreB = parseInt(scoreBInput.value);
+
+            if (isNaN(scoreA) || isNaN(scoreB) || scoreA < 0 || scoreB < 0) {
+                return showMessage('Ingresa goles válidos (0 o más).');
+            }
+
+            leagueData.playoffs[i].scoreA = scoreA;
+            leagueData.playoffs[i].scoreB = scoreB;
+            saveData();
+            showMessage(`Resultado partido ${leagueData.playoffs[i].teamA} vs ${leagueData.playoffs[i].teamB} guardado.`);
+
+            // Verificar si se pueden generar final
+            if (canGenerateFinal()) {
+                assignFinalTeams();
+                finalSection.style.display = 'block';
+                renderFinal();
+            }
+        }
+
+        // Comprueba si ambos partidos semifinales tienen resultados para avanzar a final
+        function canGenerateFinal() {
+            if (leagueData.playoffs.length < 2) return false;
+            return leagueData.playoffs.every(m => typeof m.scoreA === 'number' && typeof m.scoreB === 'number');
+        }
+
+        // Asigna equipos ganadores a la final
+        function assignFinalTeams() {
+            // Se asume que playoffs son semifinales con 2 partidos
+            const semifinal1 = leagueData.playoffs[0];
+            const semifinal2 = leagueData.playoffs[1];
+
+            function winner(match) {
+                if (match.scoreA > match.scoreB) return match.teamA;
+                if (match.scoreB > match.scoreA) return match.teamB;
+                // Empate, para simplicidad elegimos equipo A (puedes ajustar para penales)
+                return match.teamA;
+            }
+
+            const teamA = winner(semifinal1);
+            const teamB = winner(semifinal2);
+
+            leagueData.final = {
+                teamA,
+                teamB,
+                scoreA: leagueData.final?.scoreA || 0,
+                scoreB: leagueData.final?.scoreB || 0
+            };
+
+            saveData();
+        }
+
+        // Render final
+        function renderFinal() {
+            const match = leagueData.final || { teamA: '', teamB: '', scoreA: 0, scoreB: 0 };
+            finalMatchDiv.innerHTML = `
+        <label>${match.teamA}:</label>
+        <input type="number" min="0" value="${match.scoreA}" id="finalScoreA" style="width:50px" />
+        <label>vs</label>
+        <label>${match.teamB}:</label>
+        <input type="number" min="0" value="${match.scoreB}" id="finalScoreB" style="width:50px" />
+      `;
+        }
+
+        function saveFinal() {
+            if (!leagueData.final) return showChampionMessage('No hay partido final generado.');
+
+            const scoreA = parseInt(document.getElementById('finalScoreA').value);
+            const scoreB = parseInt(document.getElementById('finalScoreB').value);
+
+            if (isNaN(scoreA) || isNaN(scoreB) || scoreA < 0 || scoreB < 0) {
+                return showChampionMessage('Ingresa goles válidos (0 o más).');
+            }
+
+            leagueData.final.scoreA = scoreA;
+            leagueData.final.scoreB = scoreB;
+            saveData();
+
+            let champion;
+            if (scoreA > scoreB) champion = leagueData.final.teamA;
+            else if (scoreB > scoreA) champion = leagueData.final.teamB;
+            else champion = 'Empate - sin campeón definido';
+
+            showChampionMessage(`¡El mas malo es: ${champion}!`);
+        }
+
+        function showChampionMessage(text) {
+            const box = document.getElementById('messageBox');
+            box.innerHTML = `<h1 style="color: #2c3e50; font-size: 3em; text-align:center;">${text}</h1>`;
+            box.style.display = 'block';
+        }
+
+        // Generar playoffs (semifinales)
+        function generatePlayoffs() {
+            if (leagueData.teams.length < 4) {
+                return showMessage('Necesitas al menos 4 equipos para generar playoffs.');
+            }
+
+            // Recalcular tabla igual que en standings
+            const stats = {};
+            leagueData.teams.forEach(team => {
+                stats[team] = { PJ: 0, G: 0, E: 0, P: 0, GF: 0, GC: 0, DG: 0, PTS: 0 };
+            });
+
+            leagueData.matches.forEach(m => {
+                if (!stats[m.teamA] || !stats[m.teamB]) return;
+
+                stats[m.teamA].PJ++;
+                stats[m.teamB].PJ++;
+
+                stats[m.teamA].GF += m.scoreA;
+                stats[m.teamA].GC += m.scoreB;
+                stats[m.teamB].GF += m.scoreB;
+                stats[m.teamB].GC += m.scoreA;
+
+                if (m.scoreA > m.scoreB) {
+                    stats[m.teamA].G++;
+                    stats[m.teamB].P++;
+                    stats[m.teamA].PTS += 3;
+                } else if (m.scoreA < m.scoreB) {
+                    stats[m.teamB].G++;
+                    stats[m.teamA].P++;
+                    stats[m.teamB].PTS += 3;
+                } else {
+                    stats[m.teamA].E++;
+                    stats[m.teamB].E++;
+                    stats[m.teamA].PTS += 1;
+                    stats[m.teamB].PTS += 1;
+                }
+            });
+
+            leagueData.teams.forEach(team => {
+                stats[team].DG = stats[team].GF - stats[team].GC;
+            });
+
+            const standingsArr = leagueData.teams.map(team => ({
+                team,
+                ...stats[team]
+            }));
+
+            standingsArr.sort((a, b) => {
+                if (b.PTS !== a.PTS) return b.PTS - a.PTS;
+                if (b.DG !== a.DG) return b.DG - a.DG;
+                return b.GF - a.GF;
+            });
+
+            // Generar semifinales con marcador 0-0
+            leagueData.playoffs = [
+                { teamA: standingsArr[0].team, teamB: standingsArr[3].team, scoreA: 0, scoreB: 0 },
+                { teamA: standingsArr[1].team, teamB: standingsArr[2].team, scoreA: 0, scoreB: 0 }
+            ];
+
+            leagueData.final = null; // resetear final
+
+            saveData();
+            renderPlayoffs();
+            showMessage('Playoffs generados para los 4 mejores equipos.');
+        }
+
+        // Limpiar playoffs y final (cuando se eliminan equipos o cambian cosas)
+        function clearPlayoffsAndFinal() {
+            leagueData.playoffs = [];
+            leagueData.final = null;
+            saveData();
+            renderPlayoffs();
+        }
+
+        // Borrar todos los datos
+        function clearAllData() {
+            if (!confirm('¿Seguro que quieres borrar TODOS los datos? Esta acción no se puede deshacer.')) return;
+            leagueData = { teams: [], matches: [], playoffs: [], final: null };
+            saveData();
+            renderTeams();
+            updateTeamSelectors();
+            renderMatches();
+            renderStandings();
+            renderPlayoffs();
+            showMessage('Todos los datos han sido borrados.');
+        }
+
+        // Mostrar mensaje en div
+        function showMessage(text) {
+            const box = document.getElementById('messageBox');
+            box.textContent = text;
+            box.style.display = 'block';
+
+            setTimeout(() => {
+                box.style.display = 'none';
+            }, 3000);
+        }
+
+        // Inicializar renderizados
+        renderTeams();
+        updateTeamSelectors();
+        renderMatches();
+        renderStandings();
+        renderPlayoffs();
+
+    </script>
+</body>
+
+</html>
