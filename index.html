@@ -81,20 +81,21 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PLAYERS_ID = '69bc9cafc3097a1dd53f9936';
-const SCORES_ID  = '69bc9cc7aa77b81da9feb60d';
+const PLAYERS_ID = '69bc9b8aaa77b81da9feb194';
+const SCORES_ID  = '69bc9b79aa77b81da9feb15a';
 
 let players = [], groupMatches = {A:[],B:[]}, scores = {}, standings = {A:[],B:[]};
 let brackets = {}, scoresId = SCORES_ID, syncInterval = null;
 
 // ── jsonb.io helpers ───────────────────────────────────────────────────────────
 async function jsonbGet(id) {
-  const r = await fetch(`https://api.jsonbin.io/v3/b/${id}/`);
+  const r = await fetch(`https://api.jsonbin.io/v3/b/${id}/latest`);
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  return r.json();
+  const j = await r.json();
+  return j.record ?? j;
 }
 async function jsonbSet(id, data) {
-  const r = await fetch(`https://api.jsonbin.io/v3/b/${id}/`, {
+  const r = await fetch(`https://api.jsonbin.io/v3/b/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
@@ -117,11 +118,14 @@ async function loadAll() {
     try { saved = await jsonbGet(sid); } catch(e) { /* bin vacío, ok */ }
     scores = (saved && typeof saved === 'object' && !Array.isArray(saved)) ? saved : {};
 
+    document.getElementById('notice').style.display = 'none';
     init();
     startAutoSync();
     setSyncState('ok', 'Sincronizado');
   } catch(e) {
     setSyncState('err', 'Error: ' + e.message);
+    document.getElementById('notice').textContent = '❌ Error: ' + e.message;
+    document.getElementById('notice').style.display = 'block';
   }
 }
 
