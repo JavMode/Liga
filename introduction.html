@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Torneo eFootball</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0a0a1a; color: #fff; overflow: hidden; height: 100vh; width: 100vw; }
+
+  .slideshow { width: 100%; height: 100vh; position: relative; }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.7s ease, transform 0.7s ease;
+    transform: translateX(60px);
+    padding: 40px;
+  }
+  .slide.active {
+    opacity: 1; pointer-events: all; transform: translateX(0);
+  }
+  .slide.exit {
+    opacity: 0; transform: translateX(-60px);
+  }
+
+  /* ---- STARS BG ---- */
+  .stars {
+    position: fixed; inset: 0; overflow: hidden; z-index: 0;
+    background: radial-gradient(ellipse at 20% 50%, #0d1b3e 0%, #0a0a1a 60%);
+  }
+  .star {
+    position: absolute; border-radius: 50%;
+    background: #fff; animation: twinkle 3s infinite alternate;
+  }
+  @keyframes twinkle { 0%{opacity:0.2} 100%{opacity:0.9} }
+
+  /* ---- UCL STRIPE ACCENT ---- */
+  .ucl-stripe {
+    width: 80px; height: 4px;
+    background: linear-gradient(90deg, #1a6fc4, #c9a227, #1a6fc4);
+    border-radius: 2px; margin: 16px auto;
+  }
+
+  /* ---- SLIDE CONTENT ---- */
+  .slide-content { position: relative; z-index: 2; width: 100%; max-width: 900px; text-align: center; }
+
+  /* SLIDE 1 - PORTADA */
+  .s1-badge {
+    width: 110px; height: 110px; border-radius: 50%;
+    border: 3px solid #c9a227;
+    background: rgb(255, 255, 255);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 52px;
+  }
+  .s1-title {
+    font-size: 52px; font-weight: 900; letter-spacing: 4px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #fff 30%, #c9a227 70%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1.1;
+  }
+  .s1-sub {
+    font-size: 18px; color: #8ab4d8; letter-spacing: 6px;
+    text-transform: uppercase; margin-top: 8px;
+  }
+  .s1-season {
+    margin-top: 28px; font-size: 13px; letter-spacing: 3px;
+    color: #c9a227; text-transform: uppercase;
+    border: 1px solid rgba(201,162,39,0.3);
+    display: inline-block; padding: 6px 20px; border-radius: 20px;
+  }
+
+  /* SLIDE 2 - JUGADORES */
+  .slide-title {
+    font-size: 13px; letter-spacing: 5px; color: #8ab4d8;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .slide-heading {
+    font-size: 38px; font-weight: 800; text-transform: uppercase;
+    background: linear-gradient(135deg, #fff 40%, #c9a227);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .players-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 14px; margin-top: 28px;
+  }
+  .player-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,162,39,0.25);
+    border-radius: 14px; padding: 18px 10px;
+    position: relative; overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .player-card:hover { transform: translateY(-4px); border-color: #c9a227; }
+  .player-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(26,111,196,0.08), rgba(201,162,39,0.06));
+  }
+  .player-num {
+    font-size: 11px; letter-spacing: 2px; color: #c9a227;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .player-avatar {
+    width: 54px; height: 54px; border-radius: 50%;
+    background: linear-gradient(135deg, #1a6fc4, #0d3a6e);
+    border: 2px solid rgba(201,162,39,0.5);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 10px; font-size: 22px; font-weight: 700;
+  }
+  .player-name {
+    font-size: 14px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .player-tag {
+    font-size: 11px; color: #8ab4d8; margin-top: 3px;
+  }
+
+  /* SLIDE 3 - REGLAS */
+  .rules-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 16px; margin-top: 28px; text-align: left;
+  }
+  .rule-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(26,111,196,0.3);
+    border-radius: 14px; padding: 20px 22px;
+    border-left: 3px solid #c9a227;
+  }
+  .rule-icon { font-size: 24px; margin-bottom: 8px; }
+  .rule-card-title {
+    font-size: 13px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: #c9a227; margin-bottom: 10px;
+  }
+  .rule-item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: #cdd8e8; margin-bottom: 6px;
+  }
+  .rule-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #1a6fc4; flex-shrink: 0;
+  }
+  .rule-badge {
+    display: inline-block;
+    padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  }
+  .badge-epic { background: rgba(139,92,246,0.25); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.4); }
+  .badge-legend { background: rgba(201,162,39,0.25); color: #fde68a; border: 1px solid rgba(201,162,39,0.5); }
+  .badge-featured { background: rgba(26,111,196,0.25); color: #93c5fd; border: 1px solid rgba(26,111,196,0.4); }
+  .badge-normal { background: rgba(255,255,255,0.1); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.2); }
+
+  /* SLIDE 4 - FORMATO */
+  .format-flow {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0; margin-top: 30px; flex-wrap: wrap;
+  }
+  .format-step {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,162,39,0.3);
+    border-radius: 14px; padding: 22px 18px;
+    width: 180px; text-align: center;
+  }
+  .format-step-icon { font-size: 30px; margin-bottom: 8px; }
+  .format-step-label {
+    font-size: 10px; letter-spacing: 3px; color: #8ab4d8; text-transform: uppercase;
+  }
+  .format-step-val {
+    font-size: 18px; font-weight: 700; margin-top: 4px; color: #fff;
+  }
+  .format-arrow {
+    font-size: 22px; color: #c9a227; padding: 0 6px;
+  }
+  .format-details {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px; margin-top: 24px;
+  }
+  .fdetail {
+    background: rgba(26,111,196,0.1);
+    border: 1px solid rgba(26,111,196,0.2);
+    border-radius: 10px; padding: 14px;
+    font-size: 13px; color: #cdd8e8;
+  }
+  .fdetail strong { display: block; color: #c9a227; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+
+  /* SLIDE 5 - PREMIO */
+  .podium-wrap {
+    display: flex; align-items: flex-end; justify-content: center;
+    gap: 16px; margin-top: 30px;
+  }
+  .podium-place {
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .podium-trophy { font-size: 36px; margin-bottom: 8px; }
+  .podium-name-box {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(201,162,39,0.2);
+    border-radius: 10px; padding: 10px 16px;
+    font-size: 13px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 8px; min-width: 100px; text-align: center;
+  }
+  .podium-bar {
+    width: 110px; border-radius: 6px 6px 0 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 900;
+  }
+  .p1-bar { height: 130px; background: linear-gradient(180deg, #c9a227, #7a5f10); }
+  .p2-bar { height: 90px; background: linear-gradient(180deg, #a0aec0, #4a5568); }
+  .p3-bar { height: 60px; background: linear-gradient(180deg, #b45309, #78350f); }
+  .prize-label {
+    font-size: 11px; color: #8ab4d8; letter-spacing: 2px; text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .prize-value {
+    font-size: 20px; font-weight: 800; color: #c9a227; margin-top: 2px;
+  }
+
+  /* NAVIGATION */
+  .nav {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 16px; z-index: 100;
+  }
+  .nav-btn {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(201,162,39,0.4);
+    color: #fff; padding: 10px 22px; border-radius: 30px;
+    cursor: pointer; font-size: 13px; font-weight: 600;
+    letter-spacing: 1px; transition: all 0.2s;
+  }
+  .nav-btn:hover { background: rgba(201,162,39,0.2); border-color: #c9a227; }
+  .dots { display: flex; gap: 8px; }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,0.25); cursor: pointer;
+    transition: all 0.3s;
+  }
+  .dot.active { background: #c9a227; width: 22px; border-radius: 4px; }
+
+  /* SLIDE COUNTER */
+  .slide-counter {
+    position: fixed; top: 20px; right: 24px;
+    font-size: 12px; color: rgba(255,255,255,0.4);
+    letter-spacing: 2px; z-index: 100;
+  }
+
+  /* UCL STARS DECORATION */
+  .ucl-stars-row {
+    display: flex; gap: 6px; justify-content: center; margin: 12px 0;
+  }
+  .ucl-star {
+    width: 10px; height: 10px;
+    background: #c9a227; clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+  }
+</style>
+</head>
+<body>
+
+<!-- Stars background -->
+<div class="stars" id="stars"></div>
+
+<!-- Slide counter -->
+<div class="slide-counter" id="counter">1 / 5</div>
+
+<div class="slideshow">
+
+  <!-- SLIDE 1: PORTADA -->
+  <div class="slide active" id="s1">
+    <div class="slide-content">
+      <div class="s1-badge">
+        <img src="champions_logo.png" style="width:80px;height:80px;object-fit:contain;" />
+    </div>
+      <div class="ucl-stars-row">
+        <div class="ucl-star"></div><div class="ucl-star"></div><div class="ucl-star"></div>
+        <div class="ucl-star"></div><div class="ucl-star"></div><div class="ucl-star"></div>
+        <div class="ucl-star"></div><div class="ucl-star"></div>
+      </div>
+      <div class="s1-title">Torneo<br>eFootball</div>
+      <div class="ucl-stripe"></div>
+      <div class="s1-sub">Champions Edition</div>
+      <div class="s1-season">Temporada 2025 · Entre Amigos</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: JUGADORES -->
+  <div class="slide" id="s2">
+    <div class="slide-content">
+      <div class="slide-title">Los participantes</div>
+      <div class="slide-heading">Los Jugadores</div>
+      <div class="ucl-stripe"></div>
+      <div class="players-grid">
+        <div class="player-card">
+          <div class="player-num">Jugador 01</div>
+          <div class="player-avatar">J1</div>
+          <div class="player-name">Nombre 1</div>
+          <div class="player-tag">Tu apodo aquí</div>
+        </div>
+        <div class="player-card">
+          <div class="player-num">Jugador 02</div>
+          <div class="player-avatar">J2</div>
+          <div class="player-name">Nombre 2</div>
+          <div class="player-tag">Tu apodo aquí</div>
+        </div>
+        <div class="player-card">
+          <div class="player-num">Jugador 03</div>
+          <div class="player-avatar">J3</div>
+          <div class="player-name">Nombre 3</div>
+          <div class="player-tag">Tu apodo aquí</div>
+        </div>
+        <div class="player-card">
+          <div class="player-num">Jugador 04</div>
+          <div class="player-avatar">J4</div>
+          <div class="player-name">Nombre 4</div>
+          <div class="player-tag">Tu apodo aquí</div>
+        </div>
+        <div class="player-card">
+          <div class="player-num">Jugador 05</div>
+          <div class="player-avatar">J5</div>
+          <div class="player-name">Nombre 5</div>
+          <div class="player-tag">Tu apodo aquí</div>
+        </div>
+        <div class="player-card">
+          <div class="player-num">Jugador 06</div>
+          <div class="player-avatar">J6</div>
+          <div class="player-name">Nombre 6</div>
+          <div class="player-tag">Tu apodo aquí</div>
+        </div>
+        <div class="player-card">
+          <div class="player-num">Jugador 07</div>
+          <div class="player-avatar">J7</div>
+          <div class="player-name">Nombre 7</div>
+          <div class="player-tag">Tu apodo aquí</div>
+        </div>
+        <div class="player-card">
+          <div class="player-num">Jugador 08</div>
+          <div class="player-avatar">J8</div>
+          <div class="player-name">Nombre 8</div>
+          <div class="player-tag">Tu apodo aquí</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: REGLAS -->
+  <div class="slide" id="s3">
+    <div class="slide-content">
+      <div class="slide-title">Reglamento oficial</div>
+      <div class="slide-heading">Reglas de Cartas</div>
+      <div class="ucl-stripe"></div>
+      <div class="rules-grid">
+        <div class="rule-card">
+          <div class="rule-card-title">🃏 Tipos permitidos</div>
+          <div class="rule-item"><div class="rule-dot"></div><span class="rule-badge badge-legend">Leyenda</span>&nbsp;Máx. 1 por equipo</div>
+          <div class="rule-item"><div class="rule-dot"></div><span class="rule-badge badge-epic">Épica</span>&nbsp;Máx. 3 por equipo</div>
+          <div class="rule-item"><div class="rule-dot"></div><span class="rule-badge badge-featured">Destacada</span>&nbsp;Máx. 5 por equipo</div>
+          <div class="rule-item"><div class="rule-dot"></div><span class="rule-badge badge-normal">Normal</span>&nbsp;Sin límite</div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-card-title">⚡ Límite por rareza</div>
+          <div class="rule-item"><div class="rule-dot"></div>Máx. 3 cartas épicas o superior</div>
+          <div class="rule-item"><div class="rule-dot"></div>Rating promedio del equipo ≤ 85</div>
+          <div class="rule-item"><div class="rule-dot"></div>No se permiten cartas de evento exclusivo</div>
+          <div class="rule-item"><div class="rule-dot"></div>Solo 1 carta de candidato al Balón de Oro</div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-card-title">👤 Límite por posición</div>
+          <div class="rule-item"><div class="rule-dot"></div>Máx. 2 cartas especiales en la defensa</div>
+          <div class="rule-item"><div class="rule-dot"></div>Máx. 2 cartas especiales en el mediocampo</div>
+          <div class="rule-item"><div class="rule-dot"></div>Máx. 1 carta especial en la delantera</div>
+          <div class="rule-item"><div class="rule-dot"></div>Portero: solo cartas normales o destacadas</div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-card-title">🌍 Restricciones</div>
+          <div class="rule-item"><div class="rule-dot"></div>Máx. 5 jugadores de la misma liga</div>
+          <div class="rule-item"><div class="rule-dot"></div>Máx. 4 jugadores de la misma nación</div>
+          <div class="rule-item"><div class="rule-dot"></div>Mínimo 3 ligas diferentes en el equipo</div>
+          <div class="rule-item"><div class="rule-dot"></div>No se repiten jugadores entre participantes</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: FORMATO -->
+  <div class="slide" id="s4">
+    <div class="slide-content">
+      <div class="slide-title">Cómo se juega</div>
+      <div class="slide-heading">El Formato</div>
+      <div class="ucl-stripe"></div>
+      <div class="format-flow">
+        <div class="format-step">
+          <div class="format-step-icon">🏟️</div>
+          <div class="format-step-label">Fase de grupos</div>
+          <div class="format-step-val">2 grupos</div>
+        </div>
+        <div class="format-arrow">→</div>
+        <div class="format-step">
+          <div class="format-step-icon">⚔️</div>
+          <div class="format-step-label">Cuartos de final</div>
+          <div class="format-step-val">Ida y vuelta</div>
+        </div>
+        <div class="format-arrow">→</div>
+        <div class="format-step">
+          <div class="format-step-icon">🔥</div>
+          <div class="format-step-label">Semifinales</div>
+          <div class="format-step-val">Partido único</div>
+        </div>
+        <div class="format-arrow">→</div>
+        <div class="format-step">
+          <div class="format-step-icon">🏆</div>
+          <div class="format-step-label">Gran Final</div>
+          <div class="format-step-val">Partido único</div>
+        </div>
+      </div>
+      <div class="format-details">
+        <div class="fdetail">
+          <strong>Puntuación grupos</strong>
+          Victoria = 3 pts · Empate = 1 pt · Derrota = 0 pts
+        </div>
+        <div class="fdetail">
+          <strong>Desempate</strong>
+          Diferencia de goles → Goles a favor → Cara a cara
+        </div>
+        <div class="fdetail">
+          <strong>Tiempo de partido</strong>
+          10 min por tiempo · Prórroga y penales en eliminatorias
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: PREMIO -->
+  <div class="slide" id="s5">
+    <div class="slide-content">
+      <div class="slide-title">El gran objetivo</div>
+      <div class="slide-heading">El Premio</div>
+      <div class="ucl-stripe"></div>
+      <div class="podium-wrap">
+        <div class="podium-place">
+          <div class="podium-trophy">🥈</div>
+          <div class="podium-name-box">2do lugar</div>
+          <div class="podium-bar p2-bar">2</div>
+          <div class="prize-label">Premio</div>
+          <div class="prize-value" style="color:#a0aec0;">Subcampeón</div>
+        </div>
+        <div class="podium-place">
+          <div class="podium-trophy">🏆</div>
+          <div class="podium-name-box" style="border-color:rgba(201,162,39,0.6); color:#fde68a;">1er lugar</div>
+          <div class="podium-bar p1-bar">1</div>
+          <div class="prize-label">Premio</div>
+          <div class="prize-value">¡Campeón!</div>
+        </div>
+        <div class="podium-place">
+          <div class="podium-trophy">🥉</div>
+          <div class="podium-name-box">3er lugar</div>
+          <div class="podium-bar p3-bar">3</div>
+          <div class="prize-label">Premio</div>
+          <div class="prize-value" style="color:#b45309;">Bronce</div>
+        </div>
+      </div>
+      <div style="margin-top:28px; background:rgba(201,162,39,0.08); border:1px solid rgba(201,162,39,0.3); border-radius:14px; padding:18px 28px; display:inline-block;">
+        <div style="font-size:11px; letter-spacing:3px; color:#8ab4d8; text-transform:uppercase; margin-bottom:6px;">Premio principal</div>
+        <div style="font-size:22px; font-weight:800; color:#fde68a;">Edita aquí tu premio 🏆</div>
+        <div style="font-size:13px; color:#8ab4d8; margin-top:4px;">Ej: Invitación a comer · Trofeo · Puntos GP · Lo que decidan</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+  <div class="dots" id="dots"></div>
+  <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+</div>
+
+<script>
+  // Stars
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*4}s;opacity:${Math.random()*0.6+0.1}`;
+    starsEl.appendChild(s);
+  }
+
+  // Slideshow
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('dots');
+  const counter = document.getElementById('counter');
+  let cur = 0;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  });
+
+  function goTo(n) {
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit');
+    setTimeout(() => slides[cur < n ? cur : n].classList.remove('exit'), 700);
+    if (cur > n) slides.forEach(s => s.style.transform = '');
+    cur = n;
+    slides[cur].classList.add('active');
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === cur));
+    counter.textContent = `${cur + 1} / ${slides.length}`;
+  }
+
+  function changeSlide(dir) {
+    const next = (cur + dir + slides.length) % slides.length;
+    // direction-aware exit
+    if (dir < 0) {
+      slides.forEach(s => { s.style.transitionProperty = 'opacity, transform'; });
+    }
+    goTo(next);
+  }
+
+  // Keyboard
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') changeSlide(-1);
+  });
+</script>
+</body>
+</html>
