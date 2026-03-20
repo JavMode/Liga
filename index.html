@@ -81,15 +81,17 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PLAYERS_ID = '69bc9b8aaa77b81da9feb194';
-const SCORES_ID  = '69bc9b79aa77b81da9feb15a';
+const PLAYERS_ID = '69bc9cafc3097a1dd53f9936';
+const SCORES_ID  = '69bc9cc7aa77b81da9feb60d';
 
 let players = [], groupMatches = {A:[],B:[]}, scores = {}, standings = {A:[],B:[]};
 let brackets = {}, scoresId = SCORES_ID, syncInterval = null;
 
 // ── jsonb.io helpers ───────────────────────────────────────────────────────────
 async function jsonbGet(id) {
-  const r = await fetch(`https://api.jsonbin.io/v3/b/${id}/latest`);
+  const r = await fetch(`https://api.jsonbin.io/v3/b/${id}`, {
+    headers: { 'Cache-Control': 'no-cache' }
+  });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const j = await r.json();
   return j.record ?? j;
@@ -108,14 +110,16 @@ async function jsonbSet(id, data) {
 async function loadAll() {
   setSyncState('loading', 'Cargando...');
   try {
-    const data = await jsonbGet(PLAYERS_ID);
-    const list = Array.isArray(data) ? data : (data.players || Object.values(data));
-    if (!list || list.length < 8) throw new Error('Se necesitan 8 jugadores en el bin');
+    const raw = await jsonbGet(PLAYERS_ID);
+    console.log('Players raw:', raw);
+    const list = Array.isArray(raw) ? raw : (raw.record ? (Array.isArray(raw.record) ? raw.record : Object.values(raw.record)) : Object.values(raw));
+    console.log('Players list:', list);
+    if (!list || list.length < 8) throw new Error(`Se necesitan 8 jugadores, se encontraron ${list?.length ?? 0}`);
     players = list.slice(0,8).map(p => typeof p === 'string' ? p : (p.name || p.nombre || String(p)));
     scoresId = SCORES_ID;
 
     let saved = {};
-    try { saved = await jsonbGet(sid); } catch(e) { /* bin vacío, ok */ }
+    try { saved = await jsonbGet(SCORES_ID); } catch(e) { /* bin vacío, ok */ }
     scores = (saved && typeof saved === 'object' && !Array.isArray(saved)) ? saved : {};
 
     document.getElementById('notice').style.display = 'none';
