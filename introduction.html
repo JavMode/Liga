@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Torneo eFootball</title>
+<title>Jojotos Efootball Masters</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', sans-serif; background: #0a0a1a; color: #fff; overflow: hidden; height: 100vh; width: 100vw; }
 
-  .slideshow { width: 100%; height: 100vh; position: relative; }
+  .slideshow { width: 100%; height: calc(100vh - 62px); margin-top: 62px; position: relative; }
 
   .slide {
     position: absolute; inset: 0;
@@ -105,11 +105,14 @@
     text-transform: uppercase; margin-bottom: 8px;
   }
   .player-avatar {
-    width: 54px; height: 54px; border-radius: 50%;
-    background: linear-gradient(135deg, #1a6fc4, #0d3a6e);
+    width: 64px; height: 64px; border-radius: 50%;
     border: 2px solid rgba(201,162,39,0.5);
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 10px; font-size: 22px; font-weight: 700;
+    margin: 0 auto 10px; overflow: hidden;
+    background: linear-gradient(135deg, #1a6fc4, #0d3a6e);
+  }
+  .player-avatar img {
+    width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
   }
   .player-name {
     font-size: 14px; font-weight: 700; letter-spacing: 1px;
@@ -122,22 +125,35 @@
   /* SLIDE 3 - REGLAS */
   .rules-grid {
     display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 16px; margin-top: 28px; text-align: left;
+    gap: 18px; margin-top: 22px; text-align: left;
   }
   .rule-card {
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(26,111,196,0.3);
-    border-radius: 14px; padding: 20px 22px;
+    border-radius: 16px; padding: 26px 28px;
     border-left: 3px solid #c9a227;
   }
   .rule-icon { font-size: 24px; margin-bottom: 8px; }
   .rule-card-title {
-    font-size: 13px; font-weight: 700; letter-spacing: 2px;
-    text-transform: uppercase; color: #c9a227; margin-bottom: 10px;
+    font-size: 14px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: #c9a227; margin-bottom: 14px;
   }
   .rule-item {
     display: flex; align-items: center; gap: 8px;
-    font-size: 13px; color: #cdd8e8; margin-bottom: 6px;
+    font-size: 14px; color: #cdd8e8; margin-bottom: 8px;
+  }
+  .points-banner {
+    margin-top: 18px;
+    background: rgba(201,162,39,0.08);
+    border: 1px solid rgba(201,162,39,0.4);
+    border-radius: 14px; padding: 16px 32px;
+    display: flex; align-items: center; justify-content: center; gap: 16px;
+  }
+  .points-banner-label {
+    font-size: 12px; letter-spacing: 3px; color: #8ab4d8; text-transform: uppercase;
+  }
+  .points-banner-value {
+    font-size: 28px; font-weight: 900; color: #c9a227; letter-spacing: 2px;
   }
   .rule-dot {
     width: 6px; height: 6px; border-radius: 50%;
@@ -153,70 +169,136 @@
   .badge-featured { background: rgba(26,111,196,0.25); color: #93c5fd; border: 1px solid rgba(26,111,196,0.4); }
   .badge-normal { background: rgba(255,255,255,0.1); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.2); }
 
-  /* SLIDE 4 - FORMATO */
-  .format-flow {
-    display: flex; align-items: center; justify-content: center;
-    gap: 0; margin-top: 30px; flex-wrap: wrap;
-  }
-  .format-step {
+  /* SLIDE 11 - FORMATO (table.html style) */
+  .fmt-card {
     background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(201,162,39,0.3);
-    border-radius: 14px; padding: 22px 18px;
-    width: 180px; text-align: center;
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 12px; padding: 1.4rem 1.6rem;
+    backdrop-filter: blur(10px); text-align: left;
+    margin-top: 20px;
   }
-  .format-step-icon { font-size: 30px; margin-bottom: 8px; }
-  .format-step-label {
-    font-size: 10px; letter-spacing: 3px; color: #8ab4d8; text-transform: uppercase;
+  .fmt-card-title {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 3px; color: #c9a227;
+    margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 8px;
   }
-  .format-step-val {
-    font-size: 18px; font-weight: 700; margin-top: 4px; color: #fff;
+  .fmt-card-title::after {
+    content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.09);
   }
-  .format-arrow {
-    font-size: 22px; color: #c9a227; padding: 0 6px;
+  .fmt-table {
+    width: 100%; border-collapse: collapse; font-size: 0.88rem;
   }
-  .format-details {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 14px; margin-top: 24px;
+  .fmt-table th {
+    text-align: left; color: #6b7a99; font-weight: 500;
+    padding: 0.35rem 0.7rem; border-bottom: 1px solid rgba(255,255,255,0.09);
+    font-size: 0.72rem; letter-spacing: 1px; text-transform: uppercase;
   }
-  .fdetail {
-    background: rgba(26,111,196,0.1);
-    border: 1px solid rgba(26,111,196,0.2);
-    border-radius: 10px; padding: 14px;
-    font-size: 13px; color: #cdd8e8;
+  .fmt-table td {
+    padding: 0.6rem 0.7rem; border-bottom: 1px solid rgba(255,255,255,0.09);
+    color: #e8eaf0;
   }
-  .fdetail strong { display: block; color: #c9a227; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+  .fmt-table tr:last-child td { border-bottom: none; }
+  .fmt-table tr:hover td { background: rgba(255,255,255,0.04); }
+  .fmt-phase-icon { font-size: 1.1rem; margin-right: 6px; }
+  .fmt-badge {
+    display: inline-flex; align-items: center;
+    padding: 2px 10px; border-radius: 20px;
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap;
+  }
+  .fmt-badge.gold { background: rgba(201,162,39,0.15); color: #fde68a; border: 1px solid rgba(201,162,39,0.4); }
+  .fmt-badge.blue { background: rgba(26,111,196,0.15); color: #93c5fd; border: 1px solid rgba(26,111,196,0.35); }
+  .fmt-details-row {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 14px;
+  }
+  .fmt-detail {
+    background: rgba(26,111,196,0.07);
+    border: 1px solid rgba(26,111,196,0.18);
+    border-radius: 10px; padding: 14px 16px;
+    font-size: 0.82rem; color: #cdd8e8;
+  }
+  .fmt-detail strong {
+    display: block; color: #c9a227; font-size: 0.68rem;
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px;
+  }
 
   /* SLIDE 5 - PREMIO */
   .podium-wrap {
     display: flex; align-items: flex-end; justify-content: center;
-    gap: 16px; margin-top: 30px;
+    gap: 28px; margin-top: 24px;
   }
   .podium-place {
     display: flex; flex-direction: column; align-items: center;
   }
-  .podium-trophy { font-size: 36px; margin-bottom: 8px; }
+  .podium-trophy { font-size: 48px; margin-bottom: 10px; }
   .podium-name-box {
     background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(201,162,39,0.2);
-    border-radius: 10px; padding: 10px 16px;
-    font-size: 13px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 1px; margin-bottom: 8px; min-width: 100px; text-align: center;
+    border: 1px solid rgba(201,162,39,0.25);
+    border-radius: 12px; padding: 12px 22px;
+    font-size: 15px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 2px; margin-bottom: 12px; min-width: 140px; text-align: center;
   }
   .podium-bar {
-    width: 110px; border-radius: 6px 6px 0 0;
+    width: 150px; border-radius: 8px 8px 0 0;
     display: flex; align-items: center; justify-content: center;
-    font-size: 28px; font-weight: 900;
+    font-size: 36px; font-weight: 900;
   }
-  .p1-bar { height: 130px; background: linear-gradient(180deg, #c9a227, #7a5f10); }
-  .p2-bar { height: 90px; background: linear-gradient(180deg, #a0aec0, #4a5568); }
-  .p3-bar { height: 60px; background: linear-gradient(180deg, #b45309, #78350f); }
+  .p1-bar { height: 180px; background: linear-gradient(180deg, #f0c040, #c9a227, #7a5f10); box-shadow: 0 0 40px rgba(201,162,39,0.4); }
+  .p2-bar { height: 130px; background: linear-gradient(180deg, #d4d8e0, #a0aec0, #4a5568); }
+  .p3-bar { height: 90px; background: linear-gradient(180deg, #e07b30, #b45309, #78350f); }
   .prize-label {
-    font-size: 11px; color: #8ab4d8; letter-spacing: 2px; text-transform: uppercase;
-    margin-top: 4px;
+    font-size: 11px; color: #8ab4d8; letter-spacing: 3px; text-transform: uppercase;
+    margin-top: 10px;
   }
   .prize-value {
-    font-size: 20px; font-weight: 800; color: #c9a227; margin-top: 2px;
+    font-size: 26px; font-weight: 900; color: #c9a227; margin-top: 4px; letter-spacing: 1px;
   }
+  .prize-total-banner {
+    margin-top: 28px;
+    background: linear-gradient(135deg, rgba(201,162,39,0.12), rgba(201,162,39,0.06));
+    border: 1px solid rgba(201,162,39,0.45);
+    border-radius: 16px; padding: 18px 48px;
+    display: inline-flex; align-items: center; gap: 20px;
+  }
+  .prize-total-icon { font-size: 32px; }
+  .prize-total-label {
+    font-size: 11px; letter-spacing: 3px; color: #8ab4d8; text-transform: uppercase; margin-bottom: 4px;
+  }
+  .prize-total-value {
+    font-size: 32px; font-weight: 900; color: #fde68a; letter-spacing: 2px;
+  }
+
+  /* NAVBAR */
+  .navbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    background: rgba(10,10,26,0.55);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(201,162,39,0.4);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 62px;
+  }
+  .navbar-logo {
+    display: flex; align-items: center; gap: 12px;
+    text-decoration: none; color: #fff;
+  }
+  .navbar-logo-img {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: #fff; border: 2px solid rgba(201,162,39,0.6);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; flex-shrink: 0;
+  }
+  .navbar-logo-img img { width: 28px; height: 28px; object-fit: contain; }
+  .navbar-logo-text { font-size: 15px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+  .navbar-logo-text span { color: #c9a227; }
+  .navbar-links { display: flex; gap: 6px; }
+  .nav-link {
+    padding: 8px 18px; border-radius: 30px;
+    font-size: 13px; font-weight: 600; letter-spacing: 1px;
+    text-decoration: none; color: rgba(255,255,255,0.7);
+    transition: all 0.2s; border: 1px solid transparent;
+  }
+  .nav-link:hover { color: #fff; background: rgba(255,255,255,0.07); border-color: rgba(201,162,39,0.4); }
+  .nav-link.active { color: #c9a227; background: rgba(201,162,39,0.1); border-color: rgba(201,162,39,0.4); }
 
   /* NAVIGATION */
   .nav {
@@ -240,9 +322,69 @@
 
   /* SLIDE COUNTER */
   .slide-counter {
-    position: fixed; top: 20px; right: 24px;
+    position: fixed; top: 72px; right: 24px;
     font-size: 12px; color: rgba(255,255,255,0.4);
     letter-spacing: 2px; z-index: 100;
+  }
+
+  /* PLAYER SOLO SLIDE */
+  .player-solo {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .player-solo-num {
+    font-size: 11px; letter-spacing: 4px; color: #c9a227;
+    text-transform: uppercase; border: 1px solid rgba(201,162,39,0.35);
+    padding: 4px 16px; border-radius: 20px;
+  }
+  .player-solo-photo {
+    width: 280px; height: 280px; border-radius: 16px;
+    border: 3px solid #c9a227;
+    box-shadow: 0 0 60px rgba(201,162,39,0.35);
+    overflow: hidden; background: linear-gradient(135deg, #1a6fc4, #0d3a6e);
+  }
+  .player-solo-photo img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .player-solo-name {
+    font-size: 52px; font-weight: 900; letter-spacing: 5px; text-transform: uppercase;
+    background: linear-gradient(135deg, #fff 30%, #c9a227 70%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .player-solo-apodo-label {
+    font-size: 11px; letter-spacing: 3px; color: #8ab4d8; text-transform: uppercase;
+  }
+  .player-solo-apodo {
+    font-size: 24px; font-weight: 700; color: #fde68a; letter-spacing: 2px;
+    background: rgba(201,162,39,0.08); border: 1px solid rgba(201,162,39,0.3);
+    padding: 10px 48px; border-radius: 30px; min-width: 260px; text-align: center;
+  }
+
+  /* SECTION ANNOUNCEMENT SLIDE */
+  .section-announce {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 18px; height: 100%;
+  }
+  .section-announce-icon {
+    font-size: 72px; line-height: 1;
+    filter: drop-shadow(0 0 30px rgba(201,162,39,0.5));
+  }
+  .section-announce-label {
+    font-size: 12px; letter-spacing: 6px; color: #8ab4d8; text-transform: uppercase;
+  }
+  .section-announce-title {
+    font-size: 68px; font-weight: 900; letter-spacing: 6px; text-transform: uppercase;
+    background: linear-gradient(135deg, #fff 30%, #c9a227 70%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .section-announce-stripe {
+    width: 100px; height: 4px;
+    background: linear-gradient(90deg, #1a6fc4, #c9a227, #1a6fc4);
+    border-radius: 2px;
+  }
+  .section-announce-sub {
+    font-size: 14px; color: rgba(255,255,255,0.45); letter-spacing: 2px;
   }
 
   /* UCL STARS DECORATION */
@@ -260,8 +402,24 @@
 <!-- Stars background -->
 <div class="stars" id="stars"></div>
 
+<!-- Navbar -->
+<nav class="navbar">
+  <a href="index.html" class="navbar-logo">
+    <div class="navbar-logo-img">
+      <img src="champions_logo.png" alt="Logo" onerror="this.style.display='none'">
+    </div>
+    <span class="navbar-logo-text">Jojotos <span>Masters</span></span>
+  </a>
+  <div class="navbar-links">
+    <a href="index.html" class="nav-link">Inicio</a>
+    <a href="introduction.html" class="nav-link active">Presentación</a>
+    <a href="construccion.html" class="nav-link">Tabla</a>
+    <a href="construccion.html" class="nav-link">Highlights</a>
+  </div>
+</nav>
+
 <!-- Slide counter -->
-<div class="slide-counter" id="counter">1 / 5</div>
+<div class="slide-counter" id="counter">1 / 15</div>
 
 <div class="slideshow">
 
@@ -270,198 +428,330 @@
     <div class="slide-content">
       <div class="s1-badge">
         <img src="champions_logo.png" style="width:80px;height:80px;object-fit:contain;" />
-    </div>
+      </div>
       <div class="ucl-stars-row">
         <div class="ucl-star"></div><div class="ucl-star"></div><div class="ucl-star"></div>
         <div class="ucl-star"></div><div class="ucl-star"></div><div class="ucl-star"></div>
         <div class="ucl-star"></div><div class="ucl-star"></div>
       </div>
-      <div class="s1-title">Torneo<br>eFootball</div>
+      <div class="s1-title">Jojotos<br>eFootball<br>Masters<br>2026 - I</div>
       <div class="ucl-stripe"></div>
       <div class="s1-sub">Champions Edition</div>
-      <div class="s1-season">Temporada 2025 · Entre Amigos</div>
+      <div class="s1-season">Temporada 2026 · Ideal</div>
     </div>
   </div>
 
-  <!-- SLIDE 2: JUGADORES -->
-  <div class="slide" id="s2">
+  <!-- SLIDE: ANUNCIO PARTICIPANTES -->
+  <div class="slide">
     <div class="slide-content">
-      <div class="slide-title">Los participantes</div>
-      <div class="slide-heading">Los Jugadores</div>
-      <div class="ucl-stripe"></div>
-      <div class="players-grid">
-        <div class="player-card">
-          <div class="player-num">Jugador 01</div>
-          <div class="player-avatar">J1</div>
-          <div class="player-name">Nombre 1</div>
-          <div class="player-tag">Tu apodo aquí</div>
-        </div>
-        <div class="player-card">
-          <div class="player-num">Jugador 02</div>
-          <div class="player-avatar">J2</div>
-          <div class="player-name">Nombre 2</div>
-          <div class="player-tag">Tu apodo aquí</div>
-        </div>
-        <div class="player-card">
-          <div class="player-num">Jugador 03</div>
-          <div class="player-avatar">J3</div>
-          <div class="player-name">Nombre 3</div>
-          <div class="player-tag">Tu apodo aquí</div>
-        </div>
-        <div class="player-card">
-          <div class="player-num">Jugador 04</div>
-          <div class="player-avatar">J4</div>
-          <div class="player-name">Nombre 4</div>
-          <div class="player-tag">Tu apodo aquí</div>
-        </div>
-        <div class="player-card">
-          <div class="player-num">Jugador 05</div>
-          <div class="player-avatar">J5</div>
-          <div class="player-name">Nombre 5</div>
-          <div class="player-tag">Tu apodo aquí</div>
-        </div>
-        <div class="player-card">
-          <div class="player-num">Jugador 06</div>
-          <div class="player-avatar">J6</div>
-          <div class="player-name">Nombre 6</div>
-          <div class="player-tag">Tu apodo aquí</div>
-        </div>
-        <div class="player-card">
-          <div class="player-num">Jugador 07</div>
-          <div class="player-avatar">J7</div>
-          <div class="player-name">Nombre 7</div>
-          <div class="player-tag">Tu apodo aquí</div>
-        </div>
-        <div class="player-card">
-          <div class="player-num">Jugador 08</div>
-          <div class="player-avatar">J8</div>
-          <div class="player-name">Nombre 8</div>
-          <div class="player-tag">Tu apodo aquí</div>
-        </div>
+      <div class="section-announce">
+        <div class="section-announce-icon">👥</div>
+        <div class="section-announce-label">A continuación</div>
+        <div class="section-announce-title">Los<br>Participantes</div>
+        <div class="section-announce-stripe"></div>
+        <div class="section-announce-sub">8 jugadores · 1 campeón</div>
       </div>
     </div>
   </div>
 
-  <!-- SLIDE 3: REGLAS -->
+  <!-- SLIDES JUGADORES INDIVIDUALES -->
+  <div class="slide" id="s2">
+    <div class="slide-content">
+      <div class="slide-title">Los participantes</div>
+      <div class="ucl-stripe"></div>
+      <div class="player-solo">
+        <div class="player-solo-num">Jugador 01</div>
+        <div class="player-solo-photo"><img src="participants/adams.jpg" alt="Adams"></div>
+        <div class="player-solo-name">Adams Paredes</div>
+        <div class="player-solo-apodo">Rereretrasado</div>
+      </div>
+    </div>
+  </div>
+
   <div class="slide" id="s3">
+    <div class="slide-content">
+      <div class="slide-title">Los participantes</div>
+      <div class="ucl-stripe"></div>
+      <div class="player-solo">
+        <div class="player-solo-num">Jugador 02</div>
+        <div class="player-solo-photo"><img src="participants/cricri.jpg" alt="Cricri"></div>
+        <div class="player-solo-name">Christian Martinez</div>
+        <div class="player-solo-apodo">Cricri</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" id="s4">
+    <div class="slide-content">
+      <div class="slide-title">Los participantes</div>
+      <div class="ucl-stripe"></div>
+      <div class="player-solo">
+        <div class="player-solo-num">Jugador 03</div>
+        <div class="player-solo-photo"><img src="participants/duko.jpg" alt="Duko"></div>
+        <div class="player-solo-name">Julio Alvarado</div>
+        <div class="player-solo-apodo">Duko</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" id="s5">
+    <div class="slide-content">
+      <div class="slide-title">Los participantes</div>
+      <div class="ucl-stripe"></div>
+      <div class="player-solo">
+        <div class="player-solo-num">Jugador 04</div>
+        <div class="player-solo-photo"><img src="participants/jaime.jpg" alt="Jaime"></div>
+        <div class="player-solo-name">Jaime Suyon</div>
+        <div class="player-solo-apodo">Jaisenberg</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" id="s6">
+    <div class="slide-content">
+      <div class="slide-title">Los participantes</div>
+      <div class="ucl-stripe"></div>
+      <div class="player-solo">
+        <div class="player-solo-num">Jugador 05</div>
+        <div class="player-solo-photo"><img src="participants/jav.jpg" alt="Jav"></div>
+        <div class="player-solo-name">Javier Wan</div>
+        <div class="player-solo-apodo">JavMode</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" id="s7">
+    <div class="slide-content">
+      <div class="slide-title">Los participantes</div>
+      <div class="ucl-stripe"></div>
+      <div class="player-solo">
+        <div class="player-solo-num">Jugador 06</div>
+        <div class="player-solo-photo"><img src="participants/matias.jpg" alt="Matias"></div>
+        <div class="player-solo-name">Matias Martinez</div>
+        <div class="player-solo-apodo">Darkwano</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" id="s8">
+    <div class="slide-content">
+      <div class="slide-title">Los participantes</div>
+      <div class="ucl-stripe"></div>
+      <div class="player-solo">
+        <div class="player-solo-num">Jugador 07</div>
+        <div class="player-solo-photo"><img src="participants/pedro.jpg" alt="Pedro"></div>
+        <div class="player-solo-name">Pedro Pachas</div>
+        <div class="player-solo-apodo">YasuriToGame</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" id="s9">
+    <div class="slide-content">
+      <div class="slide-title">Los participantes</div>
+      <div class="ucl-stripe"></div>
+      <div class="player-solo">
+        <div class="player-solo-num">Jugador 08</div>
+        <div class="player-solo-photo"><img src="participants/rodrigo.jpg" alt="Rodrigo"></div>
+        <div class="player-solo-name">Rodrigo Infantes</div>
+        <div class="player-solo-apodo">Gaston</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE: ANUNCIO FORMATO -->
+  <div class="slide">
+    <div class="slide-content">
+      <div class="section-announce">
+        <div class="section-announce-icon">🏟️</div>
+        <div class="section-announce-label">A continuación</div>
+        <div class="section-announce-title">El<br>Formato</div>
+        <div class="section-announce-stripe"></div>
+        <div class="section-announce-sub">Grupos · Brackets · Gran Final</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE: REGLAS -->
+  <div class="slide" id="s10">
     <div class="slide-content">
       <div class="slide-title">Reglamento oficial</div>
       <div class="slide-heading">Reglas de Cartas</div>
       <div class="ucl-stripe"></div>
       <div class="rules-grid">
         <div class="rule-card">
-          <div class="rule-card-title">🃏 Tipos permitidos</div>
-          <div class="rule-item"><div class="rule-dot"></div><span class="rule-badge badge-legend">Leyenda</span>&nbsp;Máx. 1 por equipo</div>
-          <div class="rule-item"><div class="rule-dot"></div><span class="rule-badge badge-epic">Épica</span>&nbsp;Máx. 3 por equipo</div>
-          <div class="rule-item"><div class="rule-dot"></div><span class="rule-badge badge-featured">Destacada</span>&nbsp;Máx. 5 por equipo</div>
-          <div class="rule-item"><div class="rule-dot"></div><span class="rule-badge badge-normal">Normal</span>&nbsp;Sin límite</div>
+          <div class="rule-card-title">👑 Leyenda</div>
+          <div class="rule-item"><div class="rule-dot"></div><span class="rule-badge badge-legend">Leyenda paga</span>&nbsp;Máx. 1</div>
+          <div class="rule-item" style="padding-left:14px; font-size:12px; color:#8ab4d8;">Puede reemplazarse por 1 Épico/Showtime pago o gratis</div>
         </div>
         <div class="rule-card">
-          <div class="rule-card-title">⚡ Límite por rareza</div>
-          <div class="rule-item"><div class="rule-dot"></div>Máx. 3 cartas épicas o superior</div>
-          <div class="rule-item"><div class="rule-dot"></div>Rating promedio del equipo ≤ 85</div>
-          <div class="rule-item"><div class="rule-dot"></div>No se permiten cartas de evento exclusivo</div>
-          <div class="rule-item"><div class="rule-dot"></div>Solo 1 carta de candidato al Balón de Oro</div>
+          <div class="rule-card-title">⚡ Épico</div>
+          <div class="rule-item"><div class="rule-dot"></div><span class="rule-badge badge-epic">Épico pago</span>&nbsp;Máx. 1</div>
+          <div class="rule-item" style="padding-left:14px; font-size:12px; color:#8ab4d8;">Puede reemplazarse por 1 Épico/Showtime pago o gratis</div>
+          <div class="rule-item"><div class="rule-dot"></div><span class="rule-badge badge-epic">Épico gratis</span>&nbsp;Máx. 2</div>
         </div>
         <div class="rule-card">
-          <div class="rule-card-title">👤 Límite por posición</div>
-          <div class="rule-item"><div class="rule-dot"></div>Máx. 2 cartas especiales en la defensa</div>
-          <div class="rule-item"><div class="rule-dot"></div>Máx. 2 cartas especiales en el mediocampo</div>
-          <div class="rule-item"><div class="rule-dot"></div>Máx. 1 carta especial en la delantera</div>
-          <div class="rule-item"><div class="rule-dot"></div>Portero: solo cartas normales o destacadas</div>
+          <div class="rule-card-title">✨ Showtime</div>
+          <div class="rule-item"><div class="rule-dot"></div><span class="rule-badge badge-featured">Showtime pago</span>&nbsp;Máx. 1</div>
+          <div class="rule-item" style="padding-left:14px; font-size:12px; color:#8ab4d8;">Solo puede reemplazarse por Showtime gratis</div>
+          <div class="rule-item"><div class="rule-dot"></div><span class="rule-badge badge-featured">Showtime gratis</span>&nbsp;Máx. 2</div>
         </div>
         <div class="rule-card">
-          <div class="rule-card-title">🌍 Restricciones</div>
-          <div class="rule-item"><div class="rule-dot"></div>Máx. 5 jugadores de la misma liga</div>
-          <div class="rule-item"><div class="rule-dot"></div>Máx. 4 jugadores de la misma nación</div>
-          <div class="rule-item"><div class="rule-dot"></div>Mínimo 3 ligas diferentes en el equipo</div>
-          <div class="rule-item"><div class="rule-dot"></div>No se repiten jugadores entre participantes</div>
+          <div class="rule-card-title">🏅 Otras cartas</div>
+          <div class="rule-item"><div class="rule-dot"></div><span class="rule-badge badge-normal">POWTs / Destacados / Memorables</span></div>
+          <div class="rule-item" style="padding-left:14px; font-size:13px; color:#8ab4d8;">Sin límite</div>
         </div>
+      </div>
+      <div class="points-banner">
+        <div class="points-banner-label">Límite de puntos del equipo</div>
+        <div class="points-banner-value">2 950 pts</div>
       </div>
     </div>
   </div>
 
-  <!-- SLIDE 4: FORMATO -->
-  <div class="slide" id="s4">
+  <!-- SLIDE 11: FORMATO -->
+  <div class="slide" id="s11">
     <div class="slide-content">
       <div class="slide-title">Cómo se juega</div>
       <div class="slide-heading">El Formato</div>
       <div class="ucl-stripe"></div>
-      <div class="format-flow">
-        <div class="format-step">
-          <div class="format-step-icon">🏟️</div>
-          <div class="format-step-label">Fase de grupos</div>
-          <div class="format-step-val">2 grupos</div>
-        </div>
-        <div class="format-arrow">→</div>
-        <div class="format-step">
-          <div class="format-step-icon">⚔️</div>
-          <div class="format-step-label">Cuartos de final</div>
-          <div class="format-step-val">Ida y vuelta</div>
-        </div>
-        <div class="format-arrow">→</div>
-        <div class="format-step">
-          <div class="format-step-icon">🔥</div>
-          <div class="format-step-label">Semifinales</div>
-          <div class="format-step-val">Partido único</div>
-        </div>
-        <div class="format-arrow">→</div>
-        <div class="format-step">
-          <div class="format-step-icon">🏆</div>
-          <div class="format-step-label">Gran Final</div>
-          <div class="format-step-val">Partido único</div>
-        </div>
+
+      <div class="fmt-card">
+        <div class="fmt-card-title">🏟️ Fase de grupos · 2 grupos de 4 · Ida y Vuelta</div>
+        <table class="fmt-table">
+          <thead>
+            <tr>
+              <th>Grupo</th>
+              <th>Integrantes (por sorteo)</th>
+              <th>Clasifican</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:#fde68a;">Grupo 1</strong></td>
+              <td>1.º y 4.º de la Gran Copa Trejertadores</td>
+              <td>
+                <span class="fmt-badge gold">1.º y 2.º → Upper</span>
+                <span class="fmt-badge" style="background:rgba(139,92,246,0.15);color:#c4b5fd;border:1px solid rgba(139,92,246,0.35);margin-left:4px;">3.º y 4.º → Lower</span>
+              </td>
+            </tr>
+            <tr>
+              <td></td><td>Resto: Sorteo</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fde68a;">Grupo 2</strong></td>
+              <td>2.º y 3.º de la Gran Copa Trejertadores</td>
+              <td>
+                <span class="fmt-badge gold">1.º y 2.º → Upper</span>
+                <span class="fmt-badge" style="background:rgba(139,92,246,0.15);color:#c4b5fd;border:1px solid rgba(139,92,246,0.35);margin-left:4px;">3.º y 4.º → Lower</span>
+              </td>
+            </tr>
+            <tr>
+              <td></td><td>Resto: Sorteo</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <div class="format-details">
-        <div class="fdetail">
-          <strong>Puntuación grupos</strong>
-          Victoria = 3 pts · Empate = 1 pt · Derrota = 0 pts
+
+      <div class="fmt-card" style="margin-top:12px;">
+        <div class="fmt-card-title">⚔️ Fase eliminatoria</div>
+        <table class="fmt-table">
+          <thead>
+            <tr>
+              <th>Bracket</th>
+              <th>Fase</th>
+              <th>Formato</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="fmt-badge gold">Upper</span></td>
+              <td>Semifinales</td>
+              <td>BO3</td>
+            </tr>
+            <tr>
+              <td><span class="fmt-badge" style="background:rgba(139,92,246,0.15);color:#c4b5fd;border:1px solid rgba(139,92,246,0.35);">Lower</span></td>
+              <td>Repechaje</td>
+              <td>BO3</td>
+            </tr>
+            <tr>
+              <td><span class="fmt-badge blue">Final</span></td>
+              <td>Gran Final</td>
+              <td>BO5 🏆</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="fmt-details-row">
+        <div class="fmt-detail">
+          <strong>Puntuación</strong>
+          Victoria 3 pts · Empate 1 pt · Derrota 0 pts
         </div>
-        <div class="fdetail">
+        <div class="fmt-detail">
           <strong>Desempate</strong>
-          Diferencia de goles → Goles a favor → Cara a cara
+          Dif. goles → Goles a favor → Cara a cara
         </div>
-        <div class="fdetail">
-          <strong>Tiempo de partido</strong>
-          10 min por tiempo · Prórroga y penales en eliminatorias
+        <div class="fmt-detail">
+          <strong>Tiempo</strong>
+          15 min por tiempo · Prórroga y penales en eliminatorias
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SLIDE 5: PREMIO -->
-  <div class="slide" id="s5">
+  <!-- SLIDE: ANUNCIO PREMIO -->
+  <div class="slide">
+    <div class="slide-content">
+      <div class="section-announce">
+        <div class="section-announce-icon">🏆</div>
+        <div class="section-announce-label">A continuación</div>
+        <div class="section-announce-title">EL GRAN<br>PREMIO</div>
+        <div class="section-announce-stripe"></div>
+        <div class="section-announce-sub">Patrocinado por 🔥 Fuego y Sabor</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE: PREMIO -->
+  <div class="slide" id="s12">
     <div class="slide-content">
       <div class="slide-title">El gran objetivo</div>
-      <div class="slide-heading">El Premio</div>
+      <div class="slide-heading">Los Premios</div>
       <div class="ucl-stripe"></div>
       <div class="podium-wrap">
         <div class="podium-place">
           <div class="podium-trophy">🥈</div>
-          <div class="podium-name-box">2do lugar</div>
+          <div class="podium-name-box">2.º Lugar</div>
           <div class="podium-bar p2-bar">2</div>
           <div class="prize-label">Premio</div>
-          <div class="prize-value" style="color:#a0aec0;">Subcampeón</div>
+          <div class="prize-value" style="color:#d4d8e0;">S/. 2.000</div>
         </div>
         <div class="podium-place">
           <div class="podium-trophy">🏆</div>
-          <div class="podium-name-box" style="border-color:rgba(201,162,39,0.6); color:#fde68a;">1er lugar</div>
+          <div class="podium-name-box" style="border-color:rgba(201,162,39,0.6); color:#fde68a; background:rgba(201,162,39,0.08);">1.º Lugar</div>
           <div class="podium-bar p1-bar">1</div>
           <div class="prize-label">Premio</div>
-          <div class="prize-value">¡Campeón!</div>
+          <div class="prize-value">S/. 7.000</div>
         </div>
         <div class="podium-place">
           <div class="podium-trophy">🥉</div>
-          <div class="podium-name-box">3er lugar</div>
+          <div class="podium-name-box">3.º Lugar</div>
           <div class="podium-bar p3-bar">3</div>
           <div class="prize-label">Premio</div>
-          <div class="prize-value" style="color:#b45309;">Bronce</div>
+          <div class="prize-value" style="color:#e07b30;">S/. 1.000</div>
         </div>
       </div>
-      <div style="margin-top:28px; background:rgba(201,162,39,0.08); border:1px solid rgba(201,162,39,0.3); border-radius:14px; padding:18px 28px; display:inline-block;">
-        <div style="font-size:11px; letter-spacing:3px; color:#8ab4d8; text-transform:uppercase; margin-bottom:6px;">Premio principal</div>
-        <div style="font-size:22px; font-weight:800; color:#fde68a;">Edita aquí tu premio 🏆</div>
-        <div style="font-size:13px; color:#8ab4d8; margin-top:4px;">Ej: Invitación a comer · Trofeo · Puntos GP · Lo que decidan</div>
+      <div class="prize-total-banner">
+        <div class="prize-total-icon">💰</div>
+        <div>
+          <div class="prize-total-label">Premio total a repartir</div>
+          <div class="prize-total-value">S/. 10.000</div>
+        </div>
+      </div>
+      <div style="margin-top:16px; display:flex; align-items:center; gap:10px; justify-content:center;">
+        <span style="font-size:11px; letter-spacing:3px; color:#6b7a99; text-transform:uppercase;">Patrocinado por</span>
+        <span style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.35); border-radius:20px; padding:5px 18px; font-size:14px; font-weight:800; letter-spacing:2px; color:#fca5a5; text-transform:uppercase;">🔥 Fuego y Sabor</span>
       </div>
     </div>
   </div>

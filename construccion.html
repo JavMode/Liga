@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>En Construcción · Jojotos eFootball Masters</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #07091a;
+    --gold: #c9a227;
+    --blue: #1a6fc4;
+    --blue-light: #8ab4d8;
+    --border-gold: rgba(201,162,39,0.4);
+  }
+  body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #fff; min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* STARS */
+  .stars {
+    position: fixed; inset: 0; overflow: hidden; z-index: 0;
+    background: radial-gradient(ellipse at 20% 50%, #0d1b3e 0%, #07091a 60%);
+    pointer-events: none;
+  }
+  .star { position: absolute; border-radius: 50%; background: #fff; animation: twinkle 3s infinite alternate; }
+  @keyframes twinkle { 0%{opacity:0.2} 100%{opacity:0.9} }
+
+  /* NAVBAR */
+  .navbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    background: rgba(7,9,26,0.55); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border-gold);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 62px;
+  }
+  .navbar-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; }
+  .navbar-logo-img {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: #fff; border: 2px solid rgba(201,162,39,0.6);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; flex-shrink: 0;
+  }
+  .navbar-logo-img img { width: 28px; height: 28px; object-fit: contain; }
+  .navbar-logo-text { font-size: 15px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+  .navbar-logo-text span { color: var(--gold); }
+  .navbar-links { display: flex; gap: 6px; }
+  .nav-link {
+    padding: 8px 18px; border-radius: 30px;
+    font-size: 13px; font-weight: 600; letter-spacing: 1px;
+    text-decoration: none; color: rgba(255,255,255,0.7);
+    transition: all 0.2s; border: 1px solid transparent;
+  }
+  .nav-link:hover { color: #fff; background: rgba(255,255,255,0.07); border-color: var(--border-gold); }
+  .nav-link.active { color: var(--gold); background: rgba(201,162,39,0.1); border-color: var(--border-gold); }
+
+  /* MAIN */
+  .main {
+    position: relative; z-index: 1; flex: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 100px 40px 60px;
+  }
+  .icon { font-size: 72px; margin-bottom: 24px; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-12px); } }
+
+  .ucl-stars-row { display: flex; gap: 6px; justify-content: center; margin-bottom: 18px; }
+  .ucl-star { width: 8px; height: 8px; background: var(--gold); clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+
+  .title {
+    font-size: 48px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; line-height: 1.1;
+    background: linear-gradient(135deg, #fff 30%, var(--gold) 70%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+  }
+  .ucl-stripe {
+    width: 60px; height: 4px;
+    background: linear-gradient(90deg, var(--blue), var(--gold), var(--blue));
+    border-radius: 2px; margin: 16px auto 20px;
+  }
+  .subtitle { font-size: 15px; color: var(--blue-light); letter-spacing: 2px; margin-bottom: 36px; line-height: 1.6; }
+
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(201,162,39,0.12); border: 1px solid var(--border-gold);
+    color: var(--gold); font-size: 14px; font-weight: 600; letter-spacing: 1px;
+    padding: 12px 28px; border-radius: 30px; text-decoration: none;
+    transition: all 0.2s;
+  }
+  .back-btn:hover { background: rgba(201,162,39,0.22); transform: translateY(-2px); }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<nav class="navbar">
+  <a href="index.html" class="navbar-logo">
+    <div class="navbar-logo-img">
+      <img src="champions_logo.png" alt="Logo" onerror="this.style.display='none'">
+    </div>
+    <span class="navbar-logo-text">Jojotos <span>Masters</span></span>
+  </a>
+  <div class="navbar-links">
+    <a href="index.html" class="nav-link">Inicio</a>
+    <a href="introduction.html" class="nav-link">Presentación</a>
+    <a href="construccion.html" class="nav-link">Tabla</a>
+    <a href="construccion.html" class="nav-link">Highlights</a>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="icon">🚧</div>
+  <div class="ucl-stars-row">
+    <div class="ucl-star"></div><div class="ucl-star"></div><div class="ucl-star"></div>
+    <div class="ucl-star"></div><div class="ucl-star"></div>
+  </div>
+  <h1 class="title">Próximamente</h1>
+  <div class="ucl-stripe"></div>
+  <p class="subtitle">Esta sección está en construcción.<br>Vuelve pronto para ver el contenido.</p>
+  <a href="index.html" class="back-btn">← Volver al inicio</a>
+</div>
+
+<script>
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*4}s;opacity:${Math.random()*0.6+0.1}`;
+    starsEl.appendChild(s);
+  }
+</script>
+</body>
+</html>
