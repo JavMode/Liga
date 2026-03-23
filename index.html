@@ -1,887 +1,196 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Liga eFootball</title>
-  <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --bg: #07091a;
-      --surface: rgba(255, 255, 255, 0.04);
-      --surface2: rgba(255, 255, 255, 0.07);
-      --border: rgba(255, 255, 255, 0.09);
-      --border-gold: rgba(201, 162, 39, 0.4);
-      --gold: #c9a227;
-      --gold-light: #fde68a;
-      --blue: #1a6fc4;
-      --blue-light: #8ab4d8;
-      --text: #e8eaf0;
-      --muted: #6b7a99;
-      --green: #22c55e;
-      --red: #ef4444;
-      --yellow: #f59e0b;
-      --radius: 12px;
-      --radius-sm: 8px;
-    }
-
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 2rem 1rem 4rem;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(ellipse at 15% 40%, rgba(26, 111, 196, 0.12) 0%, transparent 60%),
-        radial-gradient(ellipse at 85% 20%, rgba(201, 162, 39, 0.08) 0%, transparent 50%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* HEADER */
-    .header {
-      text-align: center;
-      margin-bottom: 2.5rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    .header-badge {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      border: 2px solid var(--gold);
-      background: rgb(255, 255, 255);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      margin: 0 auto 14px;
-    }
-
-    .ucl-stars {
-      display: flex;
-      gap: 5px;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-
-    .ucl-star {
-      width: 8px;
-      height: 8px;
-      background: var(--gold);
-      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-    }
-
-    h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      background: linear-gradient(135deg, #fff 30%, var(--gold) 80%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 4px;
-    }
-
-    .subtitle {
-      color: var(--muted);
-      font-size: 0.8rem;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-    }
-
-    .stripe {
-      width: 60px;
-      height: 3px;
-      margin: 14px auto 0;
-      background: linear-gradient(90deg, var(--blue), var(--gold), var(--blue));
-      border-radius: 2px;
-    }
-
-    /* SYNC */
-    .sync-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      justify-content: center;
-      margin-bottom: 1.5rem;
-      font-size: 0.75rem;
-      color: var(--muted);
-      position: relative;
-      z-index: 1;
-    }
-
-    .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--muted);
-    }
-
-    .dot.ok {
-      background: var(--green);
-      box-shadow: 0 0 6px var(--green);
-    }
-
-    .dot.err {
-      background: var(--red);
-    }
-
-    .dot.loading {
-      background: var(--yellow);
-      animation: pulse 1s infinite;
-    }
-
-    @keyframes pulse {
-
-      0%,
-      100% {
-        opacity: 1
-      }
-
-      50% {
-        opacity: 0.3
-      }
-    }
-
-    .sync-btn {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 0.72rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .sync-btn:hover {
-      color: var(--text);
-      border-color: var(--border-gold);
-    }
-
-    #notice {
-      text-align: center;
-      color: var(--muted);
-      padding: 3rem;
-      font-size: 0.9rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    .sections {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-      max-width: 1100px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* CARD */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.6rem;
-      backdrop-filter: blur(10px);
-    }
-
-    .card-title {
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      color: var(--gold);
-      margin-bottom: 1.2rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .card-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    /* GROUPS TABLE */
-    .groups {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-    }
-
-    @media(max-width:600px) {
-      .groups {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .group-label {
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--blue-light);
-      margin-bottom: 0.6rem;
-    }
-
-    .group-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-    }
-
-    .group-table th {
-      text-align: left;
-      color: var(--muted);
-      font-weight: 500;
-      padding: 0.35rem 0.6rem;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.72rem;
-      letter-spacing: 1px;
-    }
-
-    .group-table td {
-      padding: 0.5rem 0.6rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .group-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .group-table tr:hover td {
-      background: var(--surface2);
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-    }
-
-    .badge.q {
-      background: rgba(201, 162, 39, 0.2);
-      color: var(--gold-light);
-      border: 1px solid rgba(201, 162, 39, 0.4);
-    }
-
-    .badge.lower {
-      background: rgba(26, 111, 196, 0.2);
-      color: #93c5fd;
-      border: 1px solid rgba(26, 111, 196, 0.35);
-    }
-
-    /* MATCHES HORIZONTAL */
-    .matches-horiz {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.8rem;
-    }
-
-    @media(max-width:700px) {
-      .matches-horiz {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    .match-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 0.9rem 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .match-card .team-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .match-card .team-name {
-      font-size: 0.88rem;
-      font-weight: 500;
-      flex: 1;
-    }
-
-    .match-card .team-name.right {
-      text-align: right;
-    }
-
-    .match-card .score {
-      font-size: 1.1rem;
-      font-weight: 800;
-      min-width: 28px;
-      text-align: center;
-      color: var(--gold-light);
-    }
-
-    .match-card .score.pending {
-      color: var(--muted);
-      font-size: 0.8rem;
-      font-weight: 400;
-    }
-
-    .match-card .divider {
-      height: 1px;
-      background: var(--border);
-    }
-
-    .match-card .away-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .match-card .winner {
-      color: var(--gold-light);
-      font-weight: 700;
-    }
-
-    .match-card .loser {
-      color: var(--muted);
-    }
-
-    /* ── BRACKET ── */
-    .bracket-wrap {
-      overflow-x: auto;
-      padding-bottom: 0.5rem;
-    }
-
-    .bracket {
-      display: flex;
-      gap: 0;
-      align-items: stretch;
-      min-width: 900px;
-    }
-
-    .b-col {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      flex: 1;
-    }
-
-    .b-col-header {
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--blue-light);
-      text-align: center;
-      padding: 0 8px 12px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 12px;
-    }
-
-    .b-col-header.gold {
-      color: var(--gold);
-    }
-
-    .b-matches {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      flex: 1;
-      gap: 12px;
-      padding: 0 8px;
-    }
-
-    /* match box */
-    .b-match {
-      position: relative;
-    }
-
-    .b-pair {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      min-width: 160px;
-    }
-
-    .b-pair.grand {
-      border-color: var(--border-gold);
-    }
-
-    .b-slot {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 14px;
-      gap: 8px;
-      min-height: 44px;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.85rem;
-    }
-
-    .b-slot:last-child {
-      border-bottom: none;
-    }
-
-    .b-slot.winner-slot {
-      background: rgba(201, 162, 39, 0.08);
-    }
-
-    .b-slot .p-name {
-      flex: 1;
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .b-slot .p-name.tbd {
-      color: var(--muted);
-      font-style: italic;
-      font-size: 0.78rem;
-      font-weight: 400;
-    }
-
-    .b-slot .p-score {
-      font-size: 1rem;
-      font-weight: 800;
-      color: var(--gold-light);
-      min-width: 20px;
-      text-align: right;
-    }
-
-    .b-slot .p-score.pending {
-      color: var(--muted);
-      font-size: 0.75rem;
-      font-weight: 400;
-    }
-
-    /* connector lines */
-    .b-connector {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      padding: 0 4px;
-    }
-
-    .b-line-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    /* upper/lower section divider */
-    .bracket-section-label {
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 6px 0 4px;
-    }
-
-    .upper-section {
-      margin-bottom: 2rem;
-    }
-
-    .lower-section {}
-
-    /* SVG connector */
-    .connector-svg {
-      overflow: visible;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      background: rgba(30, 35, 55, 0.95);
-      border: 1px solid var(--border-gold);
-      color: var(--text);
-      padding: 0.6rem 1.1rem;
-      border-radius: 30px;
-      font-size: 0.8rem;
-      opacity: 0;
-      transition: opacity 0.3s;
-      pointer-events: none;
-      z-index: 999;
-      backdrop-filter: blur(10px);
-    }
-
-    .toast.show {
-      opacity: 1;
-    }
-
-    .toast.err {
-      border-color: rgba(239, 68, 68, 0.5);
-      color: #fca5a5;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jojotos eFootball Masters 2026</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #07091a;
+    --gold: #c9a227;
+    --gold-light: #fde68a;
+    --blue: #1a6fc4;
+    --blue-light: #8ab4d8;
+    --border-gold: rgba(201,162,39,0.4);
+    --surface: rgba(255,255,255,0.04);
+  }
+  body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #fff; min-height: 100vh; }
+
+  /* STARS */
+  .stars {
+    position: fixed; inset: 0; overflow: hidden; z-index: 0;
+    background: radial-gradient(ellipse at 20% 50%, #0d1b3e 0%, #07091a 60%);
+    pointer-events: none;
+  }
+  .star {
+    position: absolute; border-radius: 50%;
+    background: #fff; animation: twinkle 3s infinite alternate;
+  }
+  @keyframes twinkle { 0%{opacity:0.2} 100%{opacity:0.9} }
+
+  /* NAVBAR */
+  .navbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    background: rgba(7,9,26,0.55);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border-gold);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 62px;
+  }
+  .navbar-logo {
+    display: flex; align-items: center; gap: 12px;
+    text-decoration: none; color: #fff;
+  }
+  .navbar-logo-img {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: #fff; border: 2px solid rgba(201,162,39,0.6);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; flex-shrink: 0;
+  }
+  .navbar-logo-img img { width: 28px; height: 28px; object-fit: contain; }
+  .navbar-logo-text { font-size: 15px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+  .navbar-logo-text span { color: var(--gold); }
+  .navbar-links { display: flex; gap: 6px; }
+  .nav-link {
+    padding: 8px 18px; border-radius: 30px;
+    font-size: 13px; font-weight: 600; letter-spacing: 1px;
+    text-decoration: none; color: rgba(255,255,255,0.7);
+    transition: all 0.2s;
+    border: 1px solid transparent;
+  }
+  .nav-link:hover { color: #fff; background: rgba(255,255,255,0.07); border-color: var(--border-gold); }
+  .nav-link.active { color: var(--gold); background: rgba(201,162,39,0.1); border-color: var(--border-gold); }
+
+  /* CONTENT */
+  .content { position: relative; z-index: 1; padding-top: 62px; }
+
+  /* HERO */
+  .hero {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: calc(100vh - 62px); text-align: center; padding: 60px 40px;
+  }
+  .hero-badge {
+    width: 120px; height: 120px; border-radius: 50%;
+    border: 3px solid var(--gold);
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 24px;
+    box-shadow: 0 0 40px rgba(201,162,39,0.3);
+  }
+  .hero-badge img { width: 88px; height: 88px; object-fit: contain; }
+  .ucl-stars-row { display: flex; gap: 6px; justify-content: center; margin-bottom: 20px; }
+  .ucl-star { width: 10px; height: 10px; background: var(--gold); clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+  .hero-title {
+    font-size: 58px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; line-height: 1.05;
+    background: linear-gradient(135deg, #fff 30%, var(--gold) 70%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+  }
+  .ucl-stripe {
+    width: 80px; height: 4px;
+    background: linear-gradient(90deg, var(--blue), var(--gold), var(--blue));
+    border-radius: 2px; margin: 16px auto;
+  }
+  .hero-sub { font-size: 16px; color: var(--blue-light); letter-spacing: 6px; text-transform: uppercase; margin-bottom: 8px; }
+  .hero-season {
+    font-size: 13px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase;
+    border: 1px solid rgba(201,162,39,0.3);
+    display: inline-block; padding: 6px 20px; border-radius: 20px; margin-bottom: 48px;
+  }
+
+  /* CARDS */
+  .cards { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border-gold);
+    border-radius: 20px; padding: 32px 28px; width: 230px; text-align: center;
+    text-decoration: none; color: #fff;
+    transition: all 0.25s; position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(26,111,196,0.08), rgba(201,162,39,0.06));
+    opacity: 0; transition: opacity 0.25s;
+  }
+  .card:hover { transform: translateY(-4px); border-color: var(--gold); box-shadow: 0 12px 40px rgba(201,162,39,0.15); }
+  .card:hover::before { opacity: 1; }
+  .card-icon { font-size: 40px; margin-bottom: 14px; }
+  .card-label { font-size: 10px; letter-spacing: 4px; color: var(--blue-light); text-transform: uppercase; margin-bottom: 6px; }
+  .card-title { font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+  .card-desc { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 8px; line-height: 1.5; }
+  .card-arrow { margin-top: 20px; font-size: 18px; color: var(--gold); opacity: 0; transform: translateX(-6px); transition: all 0.25s; }
+  .card:hover .card-arrow { opacity: 1; transform: translateX(0); }
+</style>
 </head>
-
 <body>
 
-  <div class="header">
-    <div class="header-badge">
-      <img src="champions_logo.png" style="width:50px;height:50px;object-fit:contain;" />
+<div class="stars" id="stars"></div>
+
+<nav class="navbar">
+  <a href="index.html" class="navbar-logo">
+    <div class="navbar-logo-img">
+      <img src="champions_logo.png" alt="Logo" onerror="this.style.display='none'">
     </div>
-    <h1>Liga eFootball</h1>
-    <div class="subtitle">8 Jugadores · Grupos + Double Elimination</div>
-    <div class="stripe"></div>
+    <span class="navbar-logo-text">Jojotos <span>Masters</span></span>
+  </a>
+  <div class="navbar-links">
+    <a href="index.html" class="nav-link active">Inicio</a>
+    <a href="introduction.html" class="nav-link">Presentación</a>
+    <a href="construccion.html" class="nav-link">Tabla</a>
+    <a href="construccion.html" class="nav-link">Highlights</a>
   </div>
+</nav>
 
-  <div class="sync-bar" id="syncBar" style="display:none">
-    <span class="dot" id="syncDot"></span>
-    <span id="syncMsg">—</span>
-    <button class="sync-btn" onclick="syncScores()">↻ Actualizar</button>
-  </div>
-
-  <div id="notice">Cargando liga...</div>
-  <div class="sections" id="app" style="display:none"></div>
-  <div class="toast" id="toast"></div>
-
-  <script>
-    const PLAYERS_ID = '69bc9cafc3097a1dd53f9936';
-    const SCORES_ID = '69bdc9a5b7ec241ddc8998da ';
-
-    let players = [], groupMatches = { A: [], B: [] }, scores = {}, standings = { A: [], B: [] };
-    let brackets = {}, scoresId = SCORES_ID, syncInterval = null;
-
-    async function jsonbGet(id) {
-      const r = await fetch(`https://api.jsonbin.io/v3/b/${id}`, { headers: { 'Cache-Control': 'no-cache' } });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      const j = await r.json(); return j.record ?? j;
-    }
-
-    async function loadAll() {
-      setSyncState('loading', 'Cargando...');
-      try {
-        const raw = await jsonbGet(PLAYERS_ID);
-        const list = Array.isArray(raw) ? raw : Object.values(raw.record ?? raw);
-        if (!list || list.length < 8) throw new Error(`Se necesitan 8 jugadores, encontrados: ${list?.length ?? 0}`);
-        players = list.slice(0, 8).map(p => typeof p === 'string' ? p : (p.name || p.nombre || String(p)));
-        let saved = {};
-        try { saved = await jsonbGet(SCORES_ID); } catch (e) { }
-        scores = (saved && typeof saved === 'object' && !Array.isArray(saved)) ? saved : {};
-        document.getElementById('notice').style.display = 'none';
-        init(); startAutoSync(); setSyncState('ok', 'Sincronizado');
-      } catch (e) {
-        setSyncState('err', 'Error: ' + e.message);
-        document.getElementById('notice').textContent = '❌ ' + e.message;
-      }
-    }
-
-    function startAutoSync() { stopAutoSync(); syncInterval = setInterval(syncScores, 15000); }
-    function stopAutoSync() { if (syncInterval) { clearInterval(syncInterval); syncInterval = null; } }
-
-    async function syncScores() {
-      setSyncState('loading', 'Sincronizando...');
-      try {
-        const saved = await jsonbGet(SCORES_ID);
-        if (saved && typeof saved === 'object' && !Array.isArray(saved)) { scores = saved; recalcStandings(); render(); }
-        setSyncState('ok', 'Sincronizado · ' + new Date().toLocaleTimeString());
-      } catch (e) { setSyncState('err', 'Sin conexión'); }
-    }
-
-    function setSyncState(state, msg) {
-      const bar = document.getElementById('syncBar'); bar.style.display = 'flex';
-      document.getElementById('syncDot').className = 'dot ' + state;
-      document.getElementById('syncMsg').textContent = msg;
-    }
-
-    function init() {
-      const [a1, a2, a3, a4, b1, b2, b3, b4] = players;
-      groupMatches.A = makeRR([a1, a2, a3, a4], 'A');
-      groupMatches.B = makeRR([b1, b2, b3, b4], 'B');
-      standings.A = [a1, a2, a3, a4].map(p => ({ name: p, pts: 0, gf: 0, ga: 0 }));
-      standings.B = [b1, b2, b3, b4].map(p => ({ name: p, pts: 0, gf: 0, ga: 0 }));
-      recalcStandings();
-      document.getElementById('notice').style.display = 'none';
-      document.getElementById('app').style.display = 'flex';
-      render();
-    }
-
-    function makeRR(grp, pfx) {
-      const m = [];
-      for (let i = 0; i < grp.length; i++)
-        for (let j = i + 1; j < grp.length; j++)
-          m.push({ id: `${pfx}_${i}_${j}`, home: grp[i], away: grp[j] });
-      return m;
-    }
-
-    function recalcStandings() {
-      standings.A.forEach(s => { s.pts = 0; s.gf = 0; s.ga = 0; });
-      standings.B.forEach(s => { s.pts = 0; s.gf = 0; s.ga = 0; });
-      ['A', 'B'].forEach(g => {
-        groupMatches[g].forEach(m => {
-          const sc = scores[m.id]; if (!sc) return;
-          const sh = standings[g].find(x => x.name === m.home);
-          const sa = standings[g].find(x => x.name === m.away);
-          sh.gf += sc.h; sh.ga += sc.a; sa.gf += sc.a; sa.ga += sc.h;
-          if (sc.h > sc.a) { sh.pts += 3; } else if (sc.a > sc.h) { sa.pts += 3; } else { sh.pts += 1; sa.pts += 1; }
-        });
-        standings[g].sort((a, b) => b.pts - a.pts || ((b.gf - b.ga) - (a.gf - a.ga)));
-      });
-      buildBrackets();
-    }
-
-    function buildBrackets() {
-      // Upper: 1°A vs 1°B, 2°A vs 2°B
-      // Lower: 3°A vs 4°B, 4°A vs 3°B (then winners meet)
-      const p = g => standings[g].map(s => s.name);
-      const [a1, a2, a3, a4] = p('A'), [b1, b2, b3, b4] = p('B');
-
-      brackets = {
-        // Upper bracket semis
-        US1: { id: 'US1', home: a1 || '—', away: b1 || '—' },
-        US2: { id: 'US2', home: a2 || '—', away: b2 || '—' },
-        // Upper Final
-        UF: { id: 'UF', home: winner('US1') || '?', away: winner('US2') || '?' },
-        // Lower bracket R1
-        LR1: { id: 'LR1', home: a3 || '—', away: b4 || '—' },
-        LR2: { id: 'LR2', home: b3 || '—', away: a4 || '—' },
-        // Lower QF (losers of upper semis vs winners of LR1/LR2)
-        LQ1: { id: 'LQ1', home: loser('US1') || '?', away: winner('LR1') || '?' },
-        LQ2: { id: 'LQ2', home: loser('US2') || '?', away: winner('LR2') || '?' },
-        // Lower Semi
-        LS: { id: 'LS', home: winner('LQ1') || '?', away: winner('LQ2') || '?' },
-        // Lower Final
-        LF: { id: 'LF', home: winner('LS') || '?', away: loser('UF') || '?' },
-        // Grand Final
-        GF: { id: 'GF', home: winner('UF') || '?', away: winner('LF') || '?' },
-      };
-    }
-
-    function allMatches() {
-      return Object.values(brackets).filter(Boolean);
-    }
-    function findMatch(id) { return allMatches().find(m => m && m.id === id); }
-    function winner(id) { const s = scores[id], m = findMatch(id); if (!s || !m) return null; return s.h > s.a ? m.home : s.a > s.h ? m.away : null; }
-    function loser(id) { const s = scores[id], m = findMatch(id); if (!s || !m) return null; return s.h > s.a ? m.away : s.a > s.h ? m.home : null; }
-
-    function render() { buildBrackets(); document.getElementById('app').innerHTML = renderGroups() + renderBracketSection(); }
-
-    function renderGroups() {
-      return `
-  <div class="card">
-    <div class="card-title">Fase de Grupos</div>
-    <div class="groups">${renderGroupTable('A')}${renderGroupTable('B')}</div>
-  </div>
-  <div class="card">
-    <div class="card-title">Partidos — Grupo A</div>
-    <div class="matches-horiz">${groupMatches.A.map(renderMatchCard).join('')}</div>
-  </div>
-  <div class="card">
-    <div class="card-title">Partidos — Grupo B</div>
-    <div class="matches-horiz">${groupMatches.B.map(renderMatchCard).join('')}</div>
-  </div>`;
-    }
-
-    function renderGroupTable(g) {
-      const rows = standings[g].map((s, i) => {
-        const gd = s.gf - s.ga;
-        const badge = i === 0 ? '<span class="badge q">1° Upper</span>'
-          : i === 1 ? '<span class="badge q">2° Upper</span>'
-            : i === 2 ? '<span class="badge lower">3° Lower</span>'
-              : '<span class="badge lower">4° Lower</span>';
-        return `<tr>
-      <td style="display:flex;align-items:center;gap:6px">${badge}<span>${s.name}</span></td>
-      <td style="font-weight:700;color:${s.pts > 0 ? 'var(--gold-light)' : 'var(--muted)'}">${s.pts}</td>
-      <td>${s.gf}</td><td>${s.ga}</td>
-      <td style="color:${gd > 0 ? 'var(--green)' : gd < 0 ? 'var(--red)' : 'var(--muted)'}">${gd >= 0 ? '+' : ''}${gd}</td>
-    </tr>`;
-      }).join('');
-      return `<div>
-    <div class="group-label">Grupo ${g}</div>
-    <table class="group-table">
-      <thead><tr><th>Jugador</th><th>Pts</th><th>GF</th><th>GC</th><th>DG</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-  </div>`;
-    }
-
-    function renderMatchCard(m) {
-      const sc = scores[m.id];
-      const hw = sc && sc.h > sc.a, aw = sc && sc.a > sc.h;
-      const hScore = sc ? `<span class="score${hw ? '' : ''}">${sc.h}</span>` : `<span class="score pending">—</span>`;
-      const aScore = sc ? `<span class="score${aw ? '' : ''}">${sc.a}</span>` : `<span class="score pending">—</span>`;
-      return `<div class="match-card">
-    <div class="team-row">
-      <span class="team-name${hw ? ' winner' : sc && !hw && !aw ? '' : ''}">${m.home}</span>
-      ${hScore}
+<div class="content">
+  <section class="hero">
+    <div class="hero-badge">
+      <img src="champions_logo.png" alt="Logo" onerror="this.parentElement.style.fontSize='52px';this.style.display='none';this.parentElement.insertAdjacentText('beforeend','🏆')">
     </div>
-    <div class="divider"></div>
-    <div class="team-row">
-      <span class="team-name${aw ? ' winner' : ''}">${m.away}</span>
-      ${aScore}
+    <div class="ucl-stars-row">
+      <div class="ucl-star"></div><div class="ucl-star"></div><div class="ucl-star"></div>
+      <div class="ucl-star"></div><div class="ucl-star"></div><div class="ucl-star"></div>
+      <div class="ucl-star"></div><div class="ucl-star"></div>
     </div>
-  </div>`;
-    }
+    <h1 class="hero-title">Jojotos<br>eFootball<br>Masters</h1>
+    <div class="ucl-stripe"></div>
+    <div class="hero-sub">Champions Edition</div>
+    <div class="hero-season">Temporada 2026 · I</div>
 
-    function renderBracketSection() {
-      const b = brackets;
+    <div class="cards">
+      <a href="introduction.html" class="card">
+        <div class="card-icon">🎴</div>
+        <div class="card-label">Ver torneo</div>
+        <div class="card-title">Presentación</div>
+        <div class="card-desc">Jugadores, reglas, formato y premios</div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a href="construccion.html" class="card">
+        <div class="card-icon">📊</div>
+        <div class="card-label">Ver estadísticas</div>
+        <div class="card-title">Tabla</div>
+        <div class="card-desc">Posiciones, resultados y clasificación del torneo</div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a href="construccion.html" class="card">
+        <div class="card-icon">🎬</div>
+        <div class="card-label">Mejores momentos</div>
+        <div class="card-title">Highlights</div>
+        <div class="card-desc">Los goles y jugadas más espectaculares</div>
+        <div class="card-arrow">→</div>
+      </a>
+    </div>
+  </section>
+</div>
 
-      const mkPair = (id, label) => {
-        const m = b[id]; if (!m) return '';
-        const sc = scores[id];
-        const hw = sc && sc.h > sc.a, aw = sc && sc.a > sc.h;
-        const slot = (name, isHome) => {
-          const won = isHome ? hw : aw;
-          const tbd = name === '?' || name === '—';
-          return `<div class="b-slot${won ? ' winner-slot' : ''}">
-        <span class="p-name${tbd ? ' tbd' : ''}">${tbd ? 'Por definir' : name}</span>
-        <span class="p-score${sc ? '' : ' pending'}">${sc ? (isHome ? sc.h : sc.a) : '·'}</span>
-      </div>`;
-        };
-        const isGrand = id === 'GF';
-        return `<div class="b-match">
-      ${label ? `<div style="font-size:0.65rem;color:var(--muted);letter-spacing:1px;text-align:center;margin-bottom:4px;text-transform:uppercase">${label}</div>` : ''}
-      <div class="b-pair${isGrand ? ' grand' : ''}">
-        ${slot(m.home, true)}${slot(m.away, false)}
-      </div>
-    </div>`;
-      };
-
-      // Upper bracket
-      const upperHtml = `
-    <div class="card upper-section">
-      <div class="card-title">Upper Bracket</div>
-      <div class="bracket-wrap">
-        <div class="bracket">
-          <div class="b-col">
-            <div class="b-col-header">Semifinales</div>
-            <div class="b-matches">
-              ${mkPair('US1')}
-              ${mkPair('US2')}
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;padding:0 4px;padding-top:32px">
-            <svg width="40" height="120" class="connector-svg">
-              <path d="M0,30 H20 V90 H0" fill="none" stroke="rgba(201,162,39,0.3)" stroke-width="1.5"/>
-              <line x1="20" y1="60" x2="40" y2="60" stroke="rgba(201,162,39,0.3)" stroke-width="1.5"/>
-            </svg>
-          </div>
-          <div class="b-col">
-            <div class="b-col-header gold">Final Upper</div>
-            <div class="b-matches">
-              ${mkPair('UF')}
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;padding:0 4px;padding-top:32px">
-            <svg width="40" height="60" class="connector-svg">
-              <line x1="0" y1="30" x2="40" y2="30" stroke="rgba(201,162,39,0.5)" stroke-width="1.5"/>
-            </svg>
-          </div>
-          <div class="b-col">
-            <div class="b-col-header gold">🏆 Gran Final</div>
-            <div class="b-matches">
-              ${mkPair('GF')}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>`;
-
-      // Lower bracket
-      const lowerHtml = `
-    <div class="card lower-section">
-      <div class="card-title">Lower Bracket</div>
-      <div class="bracket-wrap">
-        <div class="bracket">
-          <div class="b-col">
-            <div class="b-col-header">Ronda 1</div>
-            <div class="b-matches">
-              ${mkPair('LR1')}
-              ${mkPair('LR2')}
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;padding:0 4px;padding-top:32px">
-            <svg width="40" height="120" class="connector-svg">
-              <path d="M0,30 H20 V90 H0" fill="none" stroke="rgba(138,180,216,0.3)" stroke-width="1.5"/>
-              <line x1="20" y1="60" x2="40" y2="60" stroke="rgba(138,180,216,0.3)" stroke-width="1.5"/>
-            </svg>
-          </div>
-          <div class="b-col">
-            <div class="b-col-header">Cuartos</div>
-            <div class="b-matches">
-              ${mkPair('LQ1')}
-              ${mkPair('LQ2')}
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;padding:0 4px;padding-top:32px">
-            <svg width="40" height="120" class="connector-svg">
-              <path d="M0,30 H20 V90 H0" fill="none" stroke="rgba(138,180,216,0.3)" stroke-width="1.5"/>
-              <line x1="20" y1="60" x2="40" y2="60" stroke="rgba(138,180,216,0.3)" stroke-width="1.5"/>
-            </svg>
-          </div>
-          <div class="b-col">
-            <div class="b-col-header">Semifinal</div>
-            <div class="b-matches">
-              ${mkPair('LS')}
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;padding:0 4px;padding-top:32px">
-            <svg width="40" height="60" class="connector-svg">
-              <line x1="0" y1="30" x2="40" y2="30" stroke="rgba(138,180,216,0.3)" stroke-width="1.5"/>
-            </svg>
-          </div>
-          <div class="b-col">
-            <div class="b-col-header">Final Lower</div>
-            <div class="b-matches">
-              ${mkPair('LF')}
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;padding:0 4px;padding-top:32px">
-            <svg width="40" height="60" class="connector-svg">
-              <line x1="0" y1="30" x2="40" y2="30" stroke="rgba(201,162,39,0.4)" stroke-width="1.5" stroke-dasharray="4,3"/>
-            </svg>
-          </div>
-          <div class="b-col" style="opacity:0.5">
-            <div class="b-col-header gold">→ Gran Final</div>
-            <div class="b-matches" style="font-size:0.78rem;color:var(--muted);padding:8px">
-              El ganador va a la Gran Final (Upper Bracket)
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>`;
-
-      return upperHtml + lowerHtml;
-    }
-
-    function toast(msg, err = false) {
-      const el = document.getElementById('toast');
-      el.textContent = msg; el.className = 'toast' + (err ? ' err' : '');
-      el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 2500);
-    }
-
-    window.onload = loadAll;
-  </script>
+<script>
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*4}s;opacity:${Math.random()*0.6+0.1}`;
+    starsEl.appendChild(s);
+  }
+</script>
 </body>
-
 </html>
