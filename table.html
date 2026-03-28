@@ -675,9 +675,14 @@
     function makeRR(grp, pfx) {
       const m = [];
       for (let i = 0; i < grp.length; i++)
-        for (let j = i + 1; j < grp.length; j++)
-          m.push({ id: `${pfx}_${i}_${j}`, home: grp[i], away: grp[j] });
+        for (let j = 0; j < grp.length; j++)
+          if (i !== j)
+            m.push({ id: `${pfx}_${i}_${j}`, home: grp[i], away: grp[j] });
       return m;
+    }
+
+    function allGroupMatchesDone() {
+      return [...groupMatches.A, ...groupMatches.B].every(m => scores[m.id] !== undefined);
     }
 
     function recalcStandings() {
@@ -699,7 +704,8 @@
     function buildBrackets() {
       // Upper: 1°A vs 1°B, 2°A vs 2°B
       // Lower: 3°A vs 4°B, 4°A vs 3°B (then winners meet)
-      const p = g => standings[g].map(s => s.name);
+      const done = allGroupMatchesDone();
+      const p = g => done ? standings[g].map(s => s.name) : ['?', '?', '?', '?'];
       const [a1, a2, a3, a4] = p('A'), [b1, b2, b3, b4] = p('B');
 
       brackets = {
