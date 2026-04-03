@@ -289,8 +289,8 @@ function buildBrackets(){
   const p=g=>done?standings[g].map(s=>s.name):['?','?','?','?'];
   const [a1,a2,a3,a4]=p('A'),[b1,b2,b3,b4]=p('B');
   brackets={
-    US1:{id:'US1',home:a1||'—',away:b1||'—'},
-    US2:{id:'US2',home:a2||'—',away:b2||'—'},
+    US1:{id:'US1',home:a1||'—',away:b2||'—'},
+    US2:{id:'US2',home:a2||'—',away:b1||'—'},
     UF:{id:'UF',home:winner('US1')||'?',away:winner('US2')||'?'},
     LR1:{id:'LR1',home:a3||'—',away:b4||'—'},
     LR2:{id:'LR2',home:b3||'—',away:a4||'—'},
