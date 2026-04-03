@@ -244,16 +244,43 @@ function allGroupMatchesDone(){
 function recalcStandings(){
   standings.A.forEach(s=>{s.pts=0;s.gf=0;s.ga=0});
   standings.B.forEach(s=>{s.pts=0;s.gf=0;s.ga=0});
+
   ['A','B'].forEach(g=>{
     groupMatches[g].forEach(m=>{
       const sc=scores[m.id]; if(!sc)return;
       const sh=standings[g].find(x=>x.name===m.home);
       const sa=standings[g].find(x=>x.name===m.away);
-      sh.gf+=sc.h; sh.ga+=sc.a; sa.gf+=sc.a; sa.ga+=sc.h;
-      if(sc.h>sc.a){sh.pts+=3}else if(sc.a>sc.h){sa.pts+=3}else{sh.pts+=1;sa.pts+=1}
+
+      sh.gf+=sc.h; sh.ga+=sc.a;
+      sa.gf+=sc.a; sa.ga+=sc.h;
+
+      if(sc.h>sc.a){sh.pts+=3}
+      else if(sc.a>sc.h){sa.pts+=3}
+      else{sh.pts+=1;sa.pts+=1}
     });
-    standings[g].sort((a,b)=>b.pts-a.pts||((b.gf-b.ga)-(a.gf-a.ga)));
+
+    standings[g].sort((a,b)=>{
+      if(b.pts !== a.pts) return b.pts - a.pts;
+
+      const gdA = a.gf - a.ga;
+      const gdB = b.gf - b.ga;
+      if(gdB !== gdA) return gdB - gdA;
+
+      const tb1 = scores[`TB_${g}_${a.name}_${b.name}`];
+      const tb2 = scores[`TB_${g}_${b.name}_${a.name}`];
+
+      if(tb1){
+        return tb1.h > tb1.a ? -1 : 1;
+      }
+      if(tb2){
+        return tb2.h > tb2.a ? 1 : -1;
+      }
+
+      return 0;
+    });
+
   });
+
   buildBrackets();
 }
 
